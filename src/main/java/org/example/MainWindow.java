@@ -11,6 +11,11 @@ public class MainWindow extends Container {
     private JPanel controlsPanel;
     private JPanel graphicsPanel;
     private JLabel contrPanCoordLabel;
+    private JTextField contrPanXTextField;
+    private JLabel contrPanXLabel;
+    private JLabel contrPanYLabel;
+    private JTextField contrPanYTextField;
+    private JPanel controlsInsidePanel;
     private JMenuBar menuBar;
     public final Dimension mainWindowDims = new Dimension(600, 500);
 
