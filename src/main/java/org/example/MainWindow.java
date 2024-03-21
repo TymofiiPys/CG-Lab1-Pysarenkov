@@ -12,6 +12,8 @@ public class MainWindow extends Container {
     private JPanel mainPanel;
     private JPanel controlsPanel;
     private JPanel graphicsPanel;
+    private JLabel contrPanCoordLabel;
+    private JMenuBar menuBar;
     public final Dimension mainWindowDims = new Dimension(600, 500);
 
     public MainWindow(){
@@ -20,7 +22,7 @@ public class MainWindow extends Container {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
-                gr.drawString("ЛОХ", 228, 228);
+                gr.drawString("ЧІНАЗЕС", 228, 228);
             }
         });
         graphicsPanel.addComponentListener(new ComponentAdapter() {
@@ -32,9 +34,18 @@ public class MainWindow extends Container {
             }
         });
     }
+    public void setJMenuBar(JMenuBar menuBar) {
+        this.menuBar = menuBar;
+    }
+    public JPanel getGraphicsPanel() {
+        return graphicsPanel;
+    }
     public static void main(String[] args) {
         JFrame frame = new JFrame("ЛР№1. Локалізація точки методом ланцюгів");
         MainWindow mw = new MainWindow();
+        Lab1MenuBar menuBar = new Lab1MenuBar(frame, mw);
+        frame.setJMenuBar(menuBar);
+        mw.setJMenuBar(menuBar);
         frame.setContentPane(mw.mainPanel);
         frame.setMinimumSize(mw.mainWindowDims);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
