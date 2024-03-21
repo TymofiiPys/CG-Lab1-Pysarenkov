@@ -2,7 +2,6 @@ package org.example.pointloc;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
-import java.util.Vector;
 
 public class Graph {
     private final Point2D.Float[] nodes;
@@ -19,11 +18,16 @@ public class Graph {
         this.nodes = sortedNodes;
         this.edges = new WeightedEdge[edges.length];
         int k = 0;
-        for (int i = 0; i < edges.length; i++) {
-            for (int j = i; j < edges.length; j++) {
-                if (edges[i].getSrc().equals(this.nodes[i])
-                        && edges[i].getDest().equals(this.nodes[j])) {
-                    this.edges[k] = new WeightedEdge(this.nodes[i], this.nodes[j]);
+        for (int i = 0; i < N; i++) {
+            for (int j = i + 1; j < N; j++) {
+                for (var edge : edges) {
+                    if ((edge.getSrc().equals(this.nodes[i])
+                            && edge.getDest().equals(this.nodes[j])) ||
+                            (edge.getSrc().equals(this.nodes[j])
+                            && edge.getDest().equals(this.nodes[i]))) {
+                        this.edges[k] = new WeightedEdge(this.nodes[i], this.nodes[j]);
+                        k++;
+                    }
                 }
             }
         }
@@ -33,7 +37,7 @@ public class Graph {
         int wIn = 0;
         for (WeightedEdge edge : edges) {
             if (edge.getDest() == nodes[in]) {
-                wIn++;
+                wIn += edge.getWeight();
             }
         }
         return wIn;
@@ -43,21 +47,20 @@ public class Graph {
         int wOut = 0;
         for (WeightedEdge edge : edges) {
             if (edge.getSrc() == nodes[out]) {
-                wOut++;
+                wOut += edge.getWeight();
             }
         }
         return wOut;
     }
 
     private WeightedEdge leftMostEdgeFromPoint(int out) {
-        WeightedEdge curEdge;
         double minX = Double.POSITIVE_INFINITY;
         WeightedEdge leftMostEdge = null;
-        for (int i = out; i < N - 1; i++) {
-            if ((curEdge = edges[i]).getSrc() == nodes[out]) {
-                Point2D dest = curEdge.getDest();
+        for (var edge : edges) {
+            if (edge.getSrc() == nodes[out]) {
+                Point2D dest = edge.getDest();
                 if (dest.getX() < minX) {
-                    leftMostEdge = curEdge;
+                    leftMostEdge = edge;
                     minX = dest.getX();
                 }
             }
@@ -66,14 +69,13 @@ public class Graph {
     }
 
     private WeightedEdge leftMostEdgeToPoint(int out) {
-        WeightedEdge curEdge;
         double minX = Double.POSITIVE_INFINITY;
         WeightedEdge leftMostEdge = null;
-        for (int i = out; i < N - 1; i++) {
-            if ((curEdge = edges[i]).getDest() == nodes[out]) {
-                Point2D src = curEdge.getSrc();
+        for (var edge : edges) {
+            if (edge.getDest() == nodes[out]) {
+                Point2D src = edge.getSrc();
                 if (src.getX() < minX) {
-                    leftMostEdge = curEdge;
+                    leftMostEdge = edge;
                     minX = src.getX();
                 }
             }
@@ -106,5 +108,9 @@ public class Graph {
                 d2.setWeight(wOut[i] - wIn[i] + d2.getWeight());
             }
         }
+    }
+
+    public WeightedEdge[] getEdges() {
+        return edges;
     }
 }
