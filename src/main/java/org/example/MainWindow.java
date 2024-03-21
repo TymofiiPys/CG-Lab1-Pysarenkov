@@ -18,12 +18,9 @@ public class MainWindow extends Container {
 
     public MainWindow(){
         drawSmthButton.setText("Малюй");
-        drawSmthButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
-                gr.drawString("ЧІНАЗЕС", 228, 228);
-            }
+        drawSmthButton.addActionListener(e -> {
+            Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
+            gr.drawString("ЧІНАЗЕС", 228, 228);
         });
         graphicsPanel.addComponentListener(new ComponentAdapter() {
             @Override

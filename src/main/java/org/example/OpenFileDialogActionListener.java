@@ -7,9 +7,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 public class OpenFileDialogActionListener implements ActionListener {
-    private JFrame parent;
-    private StringBuilder openedFilePath;
-    private Runnable taskToDoAfterOpening;
+    private final JFrame parent;
+    private final StringBuilder openedFilePath;
+    private final Runnable taskToDoAfterOpening;
     public OpenFileDialogActionListener(JFrame parent, StringBuilder openedFilePath, Runnable task) {
         this.parent = parent;
         this.openedFilePath = openedFilePath;
@@ -23,9 +23,7 @@ public class OpenFileDialogActionListener implements ActionListener {
         openFileDialog.addChoosableFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if(f.getName().endsWith(".txt"))
-                    return true;
-                return false;
+                return f.getName().endsWith(".txt");
             }
 
             @Override
