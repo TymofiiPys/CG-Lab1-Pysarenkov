@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.GUI.Lab1MenuBar;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;

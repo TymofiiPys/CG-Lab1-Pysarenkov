@@ -1,4 +1,4 @@
-package org.example;
+package org.example.GUI;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
