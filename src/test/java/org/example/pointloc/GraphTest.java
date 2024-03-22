@@ -3,7 +3,9 @@ package org.example.pointloc;
 import junit.framework.TestCase;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Vector;
 
 public class GraphTest extends TestCase {
 
@@ -19,6 +21,29 @@ public class GraphTest extends TestCase {
         points[7] = new Point2D.Float(8.5f, 6);
         points[8] = new Point2D.Float(9, 2);
         return points;
+    }
+
+    public WeightedEdge[] getEdges(Point2D.Float[] points) {
+        WeightedEdge[] edges = new WeightedEdge[16];
+
+        edges[0] = new WeightedEdge(points[0], points[5]);
+        edges[1] = new WeightedEdge(points[0], points[1]);
+        edges[2] = new WeightedEdge(points[1], points[2]);
+        edges[3] = new WeightedEdge(points[1], points[3]);
+        edges[4] = new WeightedEdge(points[1], points[4]);
+        edges[5] = new WeightedEdge(points[2], points[3]);
+        edges[6] = new WeightedEdge(points[2], points[7]);
+        edges[7] = new WeightedEdge(points[2], points[8]);
+        edges[8] = new WeightedEdge(points[3], points[4]);
+        edges[9] = new WeightedEdge(points[3], points[7]);
+        edges[10] = new WeightedEdge(points[4], points[5]);
+        edges[11] = new WeightedEdge(points[4], points[6]);
+        edges[12] = new WeightedEdge(points[5], points[6]);
+        edges[13] = new WeightedEdge(points[6], points[7]);
+        edges[14] = new WeightedEdge(points[7], points[8]);
+        edges[15] = new WeightedEdge(points[4], points[7]);
+
+        return edges;
     }
 
     public void testSortPoints() {
@@ -38,23 +63,8 @@ public class GraphTest extends TestCase {
 
     public void testWeightBalancing() {
         Point2D.Float[] points = getPoints();
-        WeightedEdge[] edges = new WeightedEdge[16];
-        edges[0] = new WeightedEdge(points[0], points[5]);
-        edges[1] = new WeightedEdge(points[0], points[1]);
-        edges[2] = new WeightedEdge(points[1], points[2]);
-        edges[3] = new WeightedEdge(points[1], points[3]);
-        edges[4] = new WeightedEdge(points[1], points[4]);
-        edges[5] = new WeightedEdge(points[2], points[3]);
-        edges[6] = new WeightedEdge(points[2], points[7]);
-        edges[7] = new WeightedEdge(points[2], points[8]);
-        edges[8] = new WeightedEdge(points[3], points[4]);
-        edges[9] = new WeightedEdge(points[3], points[7]);
-        edges[10] = new WeightedEdge(points[4], points[5]);
-        edges[11] = new WeightedEdge(points[4], points[6]);
-        edges[12] = new WeightedEdge(points[5], points[6]);
-        edges[13] = new WeightedEdge(points[6], points[7]);
-        edges[14] = new WeightedEdge(points[7], points[8]);
-        edges[15] = new WeightedEdge(points[4], points[7]);
+        WeightedEdge[] edges = getEdges(points);
+
         Graph gr = new Graph(points, edges);
 
         gr.weightBalancing();
@@ -75,5 +85,31 @@ public class GraphTest extends TestCase {
         assertEquals(3, weightedEdges[13].getWeight());
         assertEquals(2, weightedEdges[14].getWeight());
         assertEquals(1, weightedEdges[15].getWeight());
+    }
+
+    public void testGetChains() {
+        Point2D.Float[] points = getPoints();
+        WeightedEdge[] edges = getEdges(points);
+
+        Graph gr = new Graph(points, edges);
+        boolean thrown = false;
+        try {
+            gr.getChains();
+        } catch (Exception e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+        thrown = false;
+        gr.weightBalancing();
+
+        Vector<ArrayList<WeightedEdge>> chains = null;
+        try {
+            chains = gr.getChains();
+        } catch (Exception e) {
+            thrown = true;
+        }
+        assertFalse(thrown);
+        assertNotNull(chains);
+        assertEquals(6, chains.size());
     }
 }
