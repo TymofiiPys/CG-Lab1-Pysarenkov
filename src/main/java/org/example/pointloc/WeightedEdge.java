@@ -5,12 +5,12 @@ import java.awt.geom.Point2D;
 public class WeightedEdge extends Edge {
     private int weight;
 
-    public WeightedEdge(Point2D.Float src, Point2D.Float dest, int weight) {
+    public WeightedEdge(GraphNode src, GraphNode dest, int weight) {
         super(src, dest);
         this.weight = weight;
     }
 
-    public WeightedEdge(Point2D.Float src, Point2D.Float dest) {
+    public WeightedEdge(GraphNode src, GraphNode dest) {
         super(src, dest);
     }
 

@@ -9,63 +9,63 @@ import java.util.Vector;
 
 public class GraphTest extends TestCase {
 
-    public Point2D.Float[] getPoints() {
-        Point2D.Float[] points = new Point2D.Float[9];
-        points[0] = new Point2D.Float(1, 8);
-        points[1] = new Point2D.Float(2, 4);
-        points[2] = new Point2D.Float(3, 1);
-        points[3] = new Point2D.Float(4.5f, 4.5f);
-        points[4] = new Point2D.Float(5, 6.5f);
-        points[5] = new Point2D.Float(5.5f, 9);
-        points[6] = new Point2D.Float(8, 7);
-        points[7] = new Point2D.Float(8.5f, 6);
-        points[8] = new Point2D.Float(9, 2);
-        return points;
+    public GraphNode[] getNodes() {
+        GraphNode[] nodes = new GraphNode[9];
+        nodes[0] = new GraphNode(new Point2D.Float(1, 8));
+        nodes[1] = new GraphNode(new Point2D.Float(2, 4));
+        nodes[2] = new GraphNode(new Point2D.Float(3, 1));
+        nodes[3] = new GraphNode(new Point2D.Float(4.5f, 4.5f));
+        nodes[4] = new GraphNode(new Point2D.Float(5, 6.5f));
+        nodes[5] = new GraphNode(new Point2D.Float(5.5f, 9));
+        nodes[6] = new GraphNode(new Point2D.Float(8, 7));
+        nodes[7] = new GraphNode(new Point2D.Float(8.5f, 6));
+        nodes[8] = new GraphNode(new Point2D.Float(9, 2));
+        return nodes;
     }
 
-    public WeightedEdge[] getEdges(Point2D.Float[] points) {
+    public WeightedEdge[] getEdges(GraphNode[] nodes) {
         WeightedEdge[] edges = new WeightedEdge[16];
 
-        edges[0] = new WeightedEdge(points[0], points[5]);
-        edges[1] = new WeightedEdge(points[0], points[1]);
-        edges[2] = new WeightedEdge(points[1], points[2]);
-        edges[3] = new WeightedEdge(points[1], points[3]);
-        edges[4] = new WeightedEdge(points[1], points[4]);
-        edges[5] = new WeightedEdge(points[2], points[3]);
-        edges[6] = new WeightedEdge(points[2], points[7]);
-        edges[7] = new WeightedEdge(points[2], points[8]);
-        edges[8] = new WeightedEdge(points[3], points[4]);
-        edges[9] = new WeightedEdge(points[3], points[7]);
-        edges[10] = new WeightedEdge(points[4], points[5]);
-        edges[11] = new WeightedEdge(points[4], points[6]);
-        edges[12] = new WeightedEdge(points[5], points[6]);
-        edges[13] = new WeightedEdge(points[6], points[7]);
-        edges[14] = new WeightedEdge(points[7], points[8]);
-        edges[15] = new WeightedEdge(points[4], points[7]);
+        edges[0] = new WeightedEdge(nodes[0], nodes[5]);
+        edges[1] = new WeightedEdge(nodes[0], nodes[1]);
+        edges[2] = new WeightedEdge(nodes[1], nodes[2]);
+        edges[3] = new WeightedEdge(nodes[1], nodes[3]);
+        edges[4] = new WeightedEdge(nodes[1], nodes[4]);
+        edges[5] = new WeightedEdge(nodes[2], nodes[3]);
+        edges[6] = new WeightedEdge(nodes[2], nodes[7]);
+        edges[7] = new WeightedEdge(nodes[2], nodes[8]);
+        edges[8] = new WeightedEdge(nodes[3], nodes[4]);
+        edges[9] = new WeightedEdge(nodes[3], nodes[7]);
+        edges[10] = new WeightedEdge(nodes[4], nodes[5]);
+        edges[11] = new WeightedEdge(nodes[4], nodes[6]);
+        edges[12] = new WeightedEdge(nodes[5], nodes[6]);
+        edges[13] = new WeightedEdge(nodes[6], nodes[7]);
+        edges[14] = new WeightedEdge(nodes[7], nodes[8]);
+        edges[15] = new WeightedEdge(nodes[4], nodes[7]);
 
         return edges;
     }
 
     public void testSortPoints() {
-        Point2D.Float[] points = getPoints();
-        Point2D.Float[] sortedPoints = points.clone();
-        Arrays.sort(sortedPoints, new Point2DYFirstComparator());
-        assertEquals(points[0], sortedPoints[7]);
-        assertEquals(points[1], sortedPoints[2]);
-        assertEquals(points[2], sortedPoints[0]);
-        assertEquals(points[3], sortedPoints[3]);
-        assertEquals(points[4], sortedPoints[5]);
-        assertEquals(points[5], sortedPoints[8]);
-        assertEquals(points[6], sortedPoints[6]);
-        assertEquals(points[7], sortedPoints[4]);
-        assertEquals(points[8], sortedPoints[1]);
+        GraphNode[] nodes = getNodes();
+        GraphNode[] sortedNodes = nodes.clone();
+        Arrays.sort(sortedNodes, new GraphNodeYFirstComparator());
+        assertEquals(nodes[0], sortedNodes[7]);
+        assertEquals(nodes[1], sortedNodes[2]);
+        assertEquals(nodes[2], sortedNodes[0]);
+        assertEquals(nodes[3], sortedNodes[3]);
+        assertEquals(nodes[4], sortedNodes[5]);
+        assertEquals(nodes[5], sortedNodes[8]);
+        assertEquals(nodes[6], sortedNodes[6]);
+        assertEquals(nodes[7], sortedNodes[4]);
+        assertEquals(nodes[8], sortedNodes[1]);
     }
 
     public void testWeightBalancing() {
-        Point2D.Float[] points = getPoints();
-        WeightedEdge[] edges = getEdges(points);
+        GraphNode[] nodes = getNodes();
+        WeightedEdge[] edges = getEdges(nodes);
 
-        Graph gr = new Graph(points, edges);
+        Graph gr = new Graph(nodes, edges);
 
         gr.weightBalancing();
         WeightedEdge[] weightedEdges = gr.getEdges();

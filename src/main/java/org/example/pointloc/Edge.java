@@ -4,19 +4,22 @@ import java.awt.geom.Point2D;
 import java.util.Objects;
 
 public class Edge  {
-    private final Point2D.Float src;
-    private final Point2D.Float dest;
+    private final GraphNode src;
+    private final GraphNode dest;
 
-    public Edge(Point2D.Float src, Point2D.Float dest) {
+    public Edge(GraphNode src, GraphNode dest) {
         this.src = src;
         this.dest = dest;
+        this.src.getOut().add(this);
+        this.dest.getIn().add(this);
+        this.src.getOut().sort();
     }
 
-    public Point2D.Float getSrc() {
+    public GraphNode getSrc() {
         return src;
     }
 
-    public Point2D.Float getDest() {
+    public GraphNode getDest() {
         return dest;
     }
 

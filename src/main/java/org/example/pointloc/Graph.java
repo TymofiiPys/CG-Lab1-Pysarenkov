@@ -3,40 +3,53 @@ package org.example.pointloc;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Vector;
 
 public class Graph {
-    private final Point2D.Float[] nodes;
+    private final GraphNode[] nodes;
     private final int N;
     private final WeightedEdge[] edges;
     private Vector<ArrayList<WeightedEdge>> chains;
     private boolean balanced = false;
     private boolean chainsFound = false;
 
-    public Graph(Point2D.Float[] nodes, Edge[] edges) {
+    public Graph(GraphNode[] nodes, Edge[] edges) {
         this.N = nodes.length;
-        Point2D.Float[] sortedNodes = new Point2D.Float[N];
+        GraphNode[] sortedNodes = new GraphNode[N];
         for (int i = 0; i < N; i++) {
-            sortedNodes[i] = new Point2D.Float((float) nodes[i].getX(), (float) nodes[i].getY());
+            sortedNodes[i] = new GraphNode(nodes[i].getLocation());
         }
-        Arrays.sort(sortedNodes, new Point2DYFirstComparator());
+        Arrays.sort(sortedNodes, new GraphNodeYFirstComparator());
         this.nodes = sortedNodes;
         this.edges = new WeightedEdge[edges.length];
         int k = 0;
-        for (int i = 0; i < N; i++) {
-            for (int j = i + 1; j < N; j++) {
-                for (var edge : edges) {
-                    if ((edge.getSrc().equals(this.nodes[i])
-                            && edge.getDest().equals(this.nodes[j])) ||
-                            (edge.getSrc().equals(this.nodes[j])
-                                    && edge.getDest().equals(this.nodes[i]))) {
-                        this.edges[k] = new WeightedEdge(this.nodes[i], this.nodes[j]);
-                        k++;
-                    }
-                }
-            }
+//        for (int i = 0; i < N; i++) {
+//            for (int j = i + 1; j < N; j++) {
+//                for (var edge : edges) {
+//                    if ((edge.getSrc().equals(this.nodes[i])
+//                            && edge.getDest().equals(this.nodes[j])) ||
+//                            (edge.getSrc().equals(this.nodes[j])
+//                                    && edge.getDest().equals(this.nodes[i]))) {
+//                        this.edges[k] = new WeightedEdge(this.nodes[i], this.nodes[j]);
+//                        k++;
+//                    }
+//                }
+//            }
+//        }
+        k = 0;
+        for (var edge : edges) {
+            this.edges[k] = new WeightedEdge(findEqualGN(this.nodes, edges[k].getSrc()),
+                    findEqualGN(this.nodes, edges[k].getDest()));
+            k++;
         }
+    }
+
+    private GraphNode findEqualGN(GraphNode[] list, GraphNode query) {
+        for (GraphNode p : list) {
+            if((query == null) ? p == null : p.equals(query))
+                return p;
+        }
+        return null;
     }
 
     private int computeWIn(int in) {

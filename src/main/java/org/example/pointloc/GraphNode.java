@@ -5,17 +5,17 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class GraphNode {
-    private final Point2D location;
+    private final Point2D.Float location;
     private final LinkedList<Edge> in;
     private final LinkedList<Edge> out;
 
-    public GraphNode(Point2D location, LinkedList<Edge> in, LinkedList<Edge> out) {
+    public GraphNode(Point2D.Float location) {
         this.location = location;
-        this.in = in;
-        this.out = out;
+        this.in = new LinkedList<>();
+        this.out = new LinkedList<>();
     }
 
-    public Point2D getLocation() {
+    public Point2D.Float getLocation() {
         return location;
     }
 
@@ -25,5 +25,13 @@ public class GraphNode {
 
     public LinkedList<Edge> getOut() {
         return out;
+    }
+
+    public float getX() {
+        return location.x;
+    }
+
+    public float getY() {
+        return location.y;
     }
 }
