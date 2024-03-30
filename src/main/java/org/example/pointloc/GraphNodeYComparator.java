@@ -1,9 +1,8 @@
 package org.example.pointloc;
 
-import java.awt.geom.Point2D;
 import java.util.Comparator;
 
-public class GraphNodeYFirstComparator implements Comparator<GraphNode> {
+public class GraphNodeYComparator implements Comparator<GraphNode> {
 
     @Override
     public int compare(GraphNode o1, GraphNode o2) {
