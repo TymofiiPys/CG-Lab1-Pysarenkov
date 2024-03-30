@@ -23,4 +23,12 @@ public class Edge  {
         Edge edge = (Edge) o;
         return Objects.equals(src, edge.src) && Objects.equals(dest, edge.dest);
     }
+
+    public GraphNode getSrc() {
+        return src;
+    }
+
+    public GraphNode getDest() {
+        return dest;
+    }
 }
