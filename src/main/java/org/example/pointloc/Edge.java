@@ -1,26 +1,19 @@
 package org.example.pointloc;
 
-import java.awt.geom.Point2D;
 import java.util.Objects;
 
+/**
+ * The Edge class represents an unweighted directed edge.
+ *
+ *  Intended for extension by WeightedEdge class.
+ */
 public class Edge  {
-    private final GraphNode src;
-    private final GraphNode dest;
+    protected final GraphNode src;
+    protected final GraphNode dest;
 
     public Edge(GraphNode src, GraphNode dest) {
         this.src = src;
         this.dest = dest;
-        this.src.getOut().add(this);
-        this.dest.getIn().add(this);
-        this.src.getOut().sort();
-    }
-
-    public GraphNode getSrc() {
-        return src;
-    }
-
-    public GraphNode getDest() {
-        return dest;
     }
 
     @Override
