@@ -30,7 +30,7 @@ public class GraphNode {
      */
     public void addInEdge(WeightedEdge edge) {
         this.in.add(edge);
-        this.in.sort(new EdgeDestXComparator());
+        this.in.sort(new EdgeSrcXComparator());
     }
 
     /**

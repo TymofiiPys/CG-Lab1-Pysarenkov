@@ -2,89 +2,74 @@ package org.example.pointloc;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Vector;
 
+/**
+ * The Graph class represents a directed weighted graph with additional functions such as
+ * weight balancing and chain set retrieval
+ */
 public class Graph {
-    private final GraphNode[] nodes;
-    private final int N;
-    private final WeightedEdge[] edges;
+    private final ArrayList<GraphNode> nodes;
+    private final int N; // amount of nodes in the graph
+    private final ArrayList<WeightedEdge> edges;
+    private final ArrayList<LinkedList<Integer>> incomingEdgeInds;
+    private final ArrayList<LinkedList<Integer>> outgoingEdgeInds;
     private Vector<ArrayList<WeightedEdge>> chains;
     private boolean balanced = false;
     private boolean chainsFound = false;
 
-    public Graph(GraphNode[] nodes, Edge[] edges) {
-        this.N = nodes.length;
-        GraphNode[] sortedNodes = new GraphNode[N];
+    public Graph(ArrayList<GraphNode> nodes, ArrayList<Edge> edges) {
+        this.N = nodes.size();
+
+        // nodes are deep-copied from the respective parameter and sorted
+        ArrayList<GraphNode> sortedNodes = new ArrayList<>(N);
         for (int i = 0; i < N; i++) {
-            sortedNodes[i] = new GraphNode(nodes[i].getLocation());
+            Point2D.Float curPt = new Point2D.Float();
+            curPt.setLocation(nodes.get(i).getLocation());
+            sortedNodes.add(i, new GraphNode(curPt));
         }
-        Arrays.sort(sortedNodes, new GraphNodeYFirstComparator());
+        sortedNodes.sort(new GraphNodeYComparator());
         this.nodes = sortedNodes;
-        this.edges = new WeightedEdge[edges.length];
-        int k = 0;
-//        for (int i = 0; i < N; i++) {
-//            for (int j = i + 1; j < N; j++) {
-//                for (var edge : edges) {
-//                    if ((edge.getSrc().equals(this.nodes[i])
-//                            && edge.getDest().equals(this.nodes[j])) ||
-//                            (edge.getSrc().equals(this.nodes[j])
-//                                    && edge.getDest().equals(this.nodes[i]))) {
-//                        this.edges[k] = new WeightedEdge(this.nodes[i], this.nodes[j]);
-//                        k++;
-//                    }
-//                }
-//            }
-//        }
-        k = 0;
-        for (var edge : edges) {
-            this.edges[k] = new WeightedEdge(findEqualGN(this.nodes, edges[k].getSrc()),
-                    findEqualGN(this.nodes, edges[k].getDest()));
-            k++;
+
+        // edges are deep-copied from the respective parameter
+        this.edges = new ArrayList<>();
+
+        for (Edge edge : edges) {
+            this.edges.add(new WeightedEdge(this.nodes.get(this.nodes.indexOf(edge.src)),
+                    this.nodes.get(this.nodes.indexOf(edge.dest))));
         }
+
+        this.incomingEdgeInds = new ArrayList<>();
+        this.outgoingEdgeInds = new ArrayList<>();
     }
 
-    private GraphNode findEqualGN(GraphNode[] list, GraphNode query) {
-        for (GraphNode p : list) {
-            if((query == null) ? p == null : p.equals(query))
-                return p;
-        }
-        return null;
-    }
-
+    /**
+     * @param in index of node in the nodes array
+     * @return total weight of edges incoming to the node
+     */
     private int computeWIn(int in) {
         int wIn = 0;
-        for (WeightedEdge edge : edges) {
-            if (edge.getDest() == nodes[in]) {
-                wIn += edge.getWeight();
-            }
+        for (WeightedEdge edge : nodes.get(in).getIn()) {
+            wIn += edge.getWeight();
         }
         return wIn;
     }
 
+    /**
+     * @param out index of node in the nodes array
+     * @return total weight of edges outgoing from the node
+     */
     private int computeWOut(int out) {
         int wOut = 0;
-        for (WeightedEdge edge : edges) {
-            if (edge.getSrc() == nodes[out]) {
-                wOut += edge.getWeight();
-            }
+        for (WeightedEdge edge : nodes.get(out).getOut()) {
+            wOut += edge.getWeight();
         }
         return wOut;
     }
 
     private WeightedEdge leftMostEdgeFromPoint(int out) {
-        double minX = Double.POSITIVE_INFINITY;
-        WeightedEdge leftMostEdge = null;
-        for (var edge : edges) {
-            if (edge.getSrc() == nodes[out]) {
-                Point2D dest = edge.getDest();
-                if (dest.getX() < minX) {
-                    leftMostEdge = edge;
-                    minX = dest.getX();
-                }
-            }
-        }
-        return leftMostEdge;
+        return nodes.get(out).getOut().get(0);
     }
 
     private int leftMostEdgeIndFromPoint(int out, WeightedEdge[] edgeList) {
@@ -102,19 +87,8 @@ public class Graph {
         return leftMostEdgeInd;
     }
 
-    private WeightedEdge leftMostEdgeToPoint(int out) {
-        double minX = Double.POSITIVE_INFINITY;
-        WeightedEdge leftMostEdge = null;
-        for (var edge : edges) {
-            if (edge.getDest() == nodes[out]) {
-                Point2D src = edge.getSrc();
-                if (src.getX() < minX) {
-                    leftMostEdge = edge;
-                    minX = src.getX();
-                }
-            }
-        }
-        return leftMostEdge;
+    private WeightedEdge leftMostEdgeToPoint(int to) {
+        return nodes.get(to).getIn().get(0);
     }
 
     public void weightBalancing() {
@@ -122,33 +96,32 @@ public class Graph {
             edge.setWeight(1);
         }
 
-        int[] wIn = new int[N];
-        int[] wOut = new int[N];
+        int wIn, wOut;
 
         for (int i = 1; i < N - 1; i++) {
-            wIn[i] = computeWIn(i);
-            wOut[i] = computeWOut(i);
-            if (wIn[i] > wOut[i]) {
+            wIn = computeWIn(i);
+            wOut = computeWOut(i);
+            if (wIn > wOut) {
                 WeightedEdge d1 = leftMostEdgeFromPoint(i);
-                d1.setWeight(wIn[i] - wOut[i] + 1);
+                d1.setWeight(wIn - wOut + 1);
             }
         }
 
         for (int i = N - 2; i > 0; i--) {
-            wIn[i] = computeWIn(i);
-            wOut[i] = computeWOut(i);
-            if (wOut[i] > wIn[i]) {
+            wIn = computeWIn(i);
+            wOut = computeWOut(i);
+            if (wOut > wIn) {
                 WeightedEdge d2 = leftMostEdgeToPoint(i);
-                d2.setWeight(wOut[i] - wIn[i] + d2.getWeight());
+                d2.setWeight(wOut - wIn + d2.getWeight());
             }
         }
 
         balanced = true;
     }
 
-    private boolean presentEdgesFrom0(WeightedEdge[] edgeList) {
-        for (int i = 0; i < edgeList.length; i++) {
-            if (edgeList[i].getWeight() > 0 && edgeList[i].getSrc() == nodes[0]) {
+    private boolean presentEdgesFrom0(int[] we) {
+        for (WeightedEdge edge : nodes.getFirst().getOut()) {
+            if (edge.getWeight() > 0) {
                 return true;
             }
         }
@@ -157,7 +130,7 @@ public class Graph {
 
     private int findInd(Point2D.Float pointToFind) {
         for (int i = 0; i < N; i++) {
-            if (nodes[i].equals(pointToFind)) {
+            if (nodes.get(i).equals(pointToFind)) {
                 return i;
             }
         }
@@ -169,17 +142,19 @@ public class Graph {
             throw new RuntimeException("The graph must be balanced first!");
         }
 
-        WeightedEdge[] edgesCopy = new WeightedEdge[edges.length];
-
-        for (int i = 0; i < edges.length; i++) {
-            edgesCopy[i] = new WeightedEdge(edges[i].getSrc(), edges[i].getDest(), edges[i].getWeight());
+        // weights are copied to a separate array
+        // so that weights in edges array are not changed
+        int[] weightsCopy = new int[edges.size()];
+        int k = 0;
+        for (var edge : edges) {
+            weightsCopy[k++] = edge.getWeight();
         }
 
         Vector<ArrayList<WeightedEdge>> chains = new Vector<>();
         ArrayList<WeightedEdge> curChain = null;
         int curSource = 0;
         WeightedEdge edgeToAdd;
-        while (presentEdgesFrom0(edgesCopy)) {
+        while (presentEdgesFrom0()) {
             curChain = new ArrayList<>();
             while (curSource != N - 1) {
                 edgeToAdd = edgesCopy[leftMostEdgeIndFromPoint(curSource, edgesCopy)];
@@ -198,7 +173,7 @@ public class Graph {
     }
 
     public int[] pointLocation(Point2D.Float point) {
-        int[] chainsBetween = new int[] {-1, -1};
+        int[] chainsBetween = new int[]{-1, -1};
         int k = 0;
         for (int i = 0; i < chains.size(); i++) {
             var curChain = chains.get(i);
@@ -213,15 +188,15 @@ public class Graph {
                             - point.getX() * dest.getY()
                             - src.getX() * point.getY()
                             - dest.getX() * src.getY();
-                    if(k == 0 && doubledSquare < 0) {
+                    if (k == 0 && doubledSquare < 0) {
                         chainsBetween[k++] = i;
                         continue;
                     }
-                    if(k == 1 && doubledSquare > 0) {
+                    if (k == 1 && doubledSquare > 0) {
                         chainsBetween[k] = i;
                         return chainsBetween;
                     }
-                    if(k == 0 && doubledSquare == 0) {
+                    if (k == 0 && doubledSquare == 0) {
                         chainsBetween[k] = i;
                     }
                 }
