@@ -4,61 +4,61 @@ import junit.framework.TestCase;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Vector;
 
 public class GraphTest extends TestCase {
 
-    public GraphNode[] getNodes() {
-        GraphNode[] nodes = new GraphNode[9];
-        nodes[0] = new GraphNode(new Point2D.Float(1, 8));
-        nodes[1] = new GraphNode(new Point2D.Float(2, 4));
-        nodes[2] = new GraphNode(new Point2D.Float(3, 1));
-        nodes[3] = new GraphNode(new Point2D.Float(4.5f, 4.5f));
-        nodes[4] = new GraphNode(new Point2D.Float(5, 6.5f));
-        nodes[5] = new GraphNode(new Point2D.Float(5.5f, 9));
-        nodes[6] = new GraphNode(new Point2D.Float(8, 7));
-        nodes[7] = new GraphNode(new Point2D.Float(8.5f, 6));
-        nodes[8] = new GraphNode(new Point2D.Float(9, 2));
+    public ArrayList<GraphNode> getNodes() {
+        ArrayList<GraphNode> nodes = new ArrayList<>();
+        nodes.add(new GraphNode(new Point2D.Float(1, 8)));
+        nodes.add(new GraphNode(new Point2D.Float(2, 4)));
+        nodes.add(new GraphNode(new Point2D.Float(3, 1)));
+        nodes.add(new GraphNode(new Point2D.Float(4.5f, 4.5f)));
+        nodes.add(new GraphNode(new Point2D.Float(5, 6.5f)));
+        nodes.add(new GraphNode(new Point2D.Float(5.5f, 9)));
+        nodes.add(new GraphNode(new Point2D.Float(8, 7)));
+        nodes.add(new GraphNode(new Point2D.Float(8.5f, 6)));
+        nodes.add(new GraphNode(new Point2D.Float(9, 2)));
         return nodes;
     }
 
-    public WeightedEdge[] getEdges(GraphNode[] nodes) {
-        WeightedEdge[] edges = new WeightedEdge[16];
+    public ArrayList<WeightedEdge> getEdges(GraphNode[] nodes) {
+        ArrayList<WeightedEdge>  edges = new ArrayList<>();
 
-        edges[0] = new WeightedEdge(nodes[0], nodes[5]);
-        edges[1] = new WeightedEdge(nodes[0], nodes[1]);
-        edges[2] = new WeightedEdge(nodes[1], nodes[2]);
-        edges[3] = new WeightedEdge(nodes[1], nodes[3]);
-        edges[4] = new WeightedEdge(nodes[1], nodes[4]);
-        edges[5] = new WeightedEdge(nodes[2], nodes[3]);
-        edges[6] = new WeightedEdge(nodes[2], nodes[7]);
-        edges[7] = new WeightedEdge(nodes[2], nodes[8]);
-        edges[8] = new WeightedEdge(nodes[3], nodes[4]);
-        edges[9] = new WeightedEdge(nodes[3], nodes[7]);
-        edges[10] = new WeightedEdge(nodes[4], nodes[5]);
-        edges[11] = new WeightedEdge(nodes[4], nodes[6]);
-        edges[12] = new WeightedEdge(nodes[5], nodes[6]);
-        edges[13] = new WeightedEdge(nodes[6], nodes[7]);
-        edges[14] = new WeightedEdge(nodes[7], nodes[8]);
-        edges[15] = new WeightedEdge(nodes[4], nodes[7]);
+        edges.add(new WeightedEdge(nodes[0], nodes[5]));
+        edges.add(new WeightedEdge(nodes[0], nodes[1]));
+        edges.add(new WeightedEdge(nodes[1], nodes[2]));
+        edges.add(new WeightedEdge(nodes[1], nodes[3]));
+        edges.add(new WeightedEdge(nodes[1], nodes[4]));
+        edges.add(new WeightedEdge(nodes[2], nodes[3]));
+        edges.add(new WeightedEdge(nodes[2], nodes[7]));
+        edges.add(new WeightedEdge(nodes[2], nodes[8]));
+        edges.add(new WeightedEdge(nodes[3], nodes[4]));
+        edges.add(new WeightedEdge(nodes[3], nodes[7]));
+        edges.add(new WeightedEdge(nodes[4], nodes[5]));
+        edges.add(new WeightedEdge(nodes[4], nodes[6]));
+        edges.add(new WeightedEdge(nodes[5], nodes[6]));
+        edges.add(new WeightedEdge(nodes[6], nodes[7]));
+        edges.add(new WeightedEdge(nodes[7], nodes[8]));
+        edges.add(new WeightedEdge(nodes[4], nodes[7]));
 
         return edges;
     }
 
     public void testSortPoints() {
-        GraphNode[] nodes = getNodes();
-        GraphNode[] sortedNodes = nodes.clone();
-        Arrays.sort(sortedNodes, new GraphNodeYFirstComparator());
-        assertEquals(nodes[0], sortedNodes[7]);
-        assertEquals(nodes[1], sortedNodes[2]);
-        assertEquals(nodes[2], sortedNodes[0]);
-        assertEquals(nodes[3], sortedNodes[3]);
-        assertEquals(nodes[4], sortedNodes[5]);
-        assertEquals(nodes[5], sortedNodes[8]);
-        assertEquals(nodes[6], sortedNodes[6]);
-        assertEquals(nodes[7], sortedNodes[4]);
-        assertEquals(nodes[8], sortedNodes[1]);
+        ArrayList<GraphNode> nodes = getNodes();
+        ArrayList<GraphNode> sortedNodes = new ArrayList<>();
+        sortedNodes.addAll(nodes);
+        sortedNodes.sort(new GraphNodeYComparator());
+        assertEquals(nodes.get(0), sortedNodes.get(7));
+        assertEquals(nodes.get(1), sortedNodes.get(2));
+        assertEquals(nodes.get(2), sortedNodes.get(0));
+        assertEquals(nodes.get(3), sortedNodes.get(3));
+        assertEquals(nodes.get(4), sortedNodes.get(5));
+        assertEquals(nodes.get(5), sortedNodes.get(8));
+        assertEquals(nodes.get(6), sortedNodes.get(6));
+        assertEquals(nodes.get(7), sortedNodes.get(4));
+        assertEquals(nodes.get(8), sortedNodes.get(1));
     }
 
     public void testWeightBalancing() {
