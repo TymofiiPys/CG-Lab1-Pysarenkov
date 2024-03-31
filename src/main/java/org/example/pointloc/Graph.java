@@ -1,9 +1,11 @@
 package org.example.pointloc;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Vector;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * The Graph class represents a directed weighted graph with additional functions such as
@@ -32,6 +34,12 @@ public class Graph {
     private boolean chainsFound = false;
 
     public Graph(ArrayList<Point2D.Float> nodes, ArrayList<Edge> edges) {
+        if (nodes == null) {
+            throw new IllegalArgumentException("nodes is null");
+        }
+        if (edges == null) {
+            throw new IllegalArgumentException("edges is null");
+        }
         this.N = nodes.size();
 
         // nodes are deep-copied from the respective parameter and sorted
@@ -50,15 +58,72 @@ public class Graph {
         this.incomingEdgeIndices = new ArrayList<>();
         this.outgoingEdgeIndices = new ArrayList<>();
 
+        for (int i = 0; i < N; i++) {
+            incomingEdgeIndices.add(new LinkedList<>());
+            outgoingEdgeIndices.add(new LinkedList<>());
+        }
+
         int k = 0;
         for (Edge edge : edges) {
             int srcInd = this.nodes.indexOf(edge.getSrc());
             int destInd = this.nodes.indexOf(edge.getDest());
+            //swap indices if the srcInd-th point is larger than destInd-th,
+            //use the fact that nodes array is already sorted
+            if (srcInd > destInd) {
+                int temp = srcInd;
+                srcInd = destInd;
+                destInd = temp;
+            }
             this.edges.add(k, new WeightedEdge(this.nodes.get(srcInd),
                     this.nodes.get(destInd)));
             addToNodeLists(srcInd, destInd, k);
             k++;
         }
+        System.out.println();
+    }
+
+    public static Graph readFromFile(String filename) {
+        Stream<String> fileLines;
+        try {
+            fileLines = Files.lines(Paths.get(filename));
+        } catch (IOException e) {
+            throw new RuntimeException("Literally impossible to get this one, man", e);
+        }
+        ArrayList<Point2D.Float> nodes = new ArrayList<>();
+        ArrayList<Edge> edges = new ArrayList<>();
+        Scanner lineScanner;
+        float x, y;
+        int pt1, pt2;
+        boolean readEdges = false;
+        for (String line : fileLines.toList()) {
+            if (line.isEmpty()) {
+                readEdges = true;
+                continue;
+            }
+            lineScanner = new Scanner(line);
+            if (!readEdges) {
+                try {
+                    x = lineScanner.nextFloat();
+                    y = lineScanner.nextFloat();
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("File opened has wrong format");
+                }
+                nodes.add(new Point2D.Float(x, y));
+            } else {
+                try {
+                    pt1 = lineScanner.nextInt();
+                    pt2 = lineScanner.nextInt();
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("File opened has wrong format");
+                }
+                try {
+                    edges.add(new Edge(nodes.get(pt1), nodes.get(pt2)));
+                } catch (IndexOutOfBoundsException e) {
+                    throw new IllegalArgumentException("Wrong indices of points in edge section");
+                }
+            }
+        }
+        return new Graph(nodes, edges);
     }
 
     private void addToNodeLists(int srcNodeIndex, int destNodeIndex, int edgeIndex) {
@@ -78,9 +143,6 @@ public class Graph {
         for (int index : incomingEdgeIndices.get(in)) {
             wIn += edges.get(index).getWeight();
         }
-//        for (WeightedEdge edge : nodes.get(in).getIn()) {
-//            wIn += edge.getWeight();
-//        }
         return wIn;
     }
 
@@ -93,14 +155,10 @@ public class Graph {
         for (int index : outgoingEdgeIndices.get(out)) {
             wOut += edges.get(index).getWeight();
         }
-//        for (WeightedEdge edge : nodes.get(out).getOut()) {
-//            wOut += edge.getWeight();
-//        }
         return wOut;
     }
 
     private WeightedEdge leftMostEdgeFromPoint(int out) {
-//        return nodes.get(out).getOut().get(0);
         return edges.get(outgoingEdgeIndices.get(out).get(0));
     }
 
@@ -114,7 +172,6 @@ public class Graph {
     }
 
     private WeightedEdge leftMostEdgeToPoint(int to) {
-//        return nodes.get(to).getIn().get(0);
         return edges.get(incomingEdgeIndices.get(to).get(0));
     }
 
@@ -147,13 +204,8 @@ public class Graph {
     }
 
     private boolean presentEdgesFrom0(int[] weights) {
-//        for (WeightedEdge edge : nodes.getFirst().getOut()) {
-//            if (edge.getWeight() > 0) {
-//                return true;
-//            }
-//        }
         for (int index : outgoingEdgeIndices.get(0)) {
-            if(weights[index] > 0) {
+            if (weights[index] > 0) {
                 return true;
             }
         }
@@ -183,7 +235,7 @@ public class Graph {
         }
 
         Vector<ArrayList<WeightedEdge>> chains = new Vector<>();
-        ArrayList<WeightedEdge> curChain = null;
+        ArrayList<WeightedEdge> curChain;
         int curSource = 0;
         WeightedEdge edgeToAdd;
         while (presentEdgesFrom0(weightsCopy)) {
@@ -210,10 +262,9 @@ public class Graph {
         int k = 0;
         for (int i = 0; i < chains.size(); i++) {
             var curChain = chains.get(i);
-            int edgesInCurChain = curChain.size();
-            for (int j = 0; j < edgesInCurChain; j++) {
-                Point2D.Float src = curChain.get(j).getSrc();
-                Point2D.Float dest = curChain.get(j).getDest();
+            for (WeightedEdge weightedEdge : curChain) {
+                Point2D.Float src = weightedEdge.getSrc();
+                Point2D.Float dest = weightedEdge.getDest();
                 if (src.getY() < point.getY() && dest.getY() > point.getY()) {
                     double doubledSquare = src.getX() * dest.getY()
                             + point.getX() * src.getY()
@@ -231,6 +282,7 @@ public class Graph {
                     }
                     if (k == 0 && doubledSquare == 0) {
                         chainsBetween[k] = i;
+                        return chainsBetween;
                     }
                 }
             }
@@ -240,5 +292,9 @@ public class Graph {
 
     public ArrayList<WeightedEdge> getEdges() {
         return edges;
+    }
+
+    public ArrayList<Point2D.Float> getNodes() {
+        return nodes;
     }
 }

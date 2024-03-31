@@ -5,7 +5,6 @@ import java.util.Objects;
 
 /**
  * The Edge class represents an unweighted directed edge.
- *
  *  Intended for extension by WeightedEdge class.
  */
 public class Edge  {

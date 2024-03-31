@@ -11,10 +11,6 @@ public class Point2DYComparator implements Comparator<Point2D> {
             return 1;
         if(o1.getY() < o2.getY())
             return -1;
-        if(o1.getX() > o2.getX())
-            return 1;
-        if(o1.getX() < o2.getX())
-            return -1;
-        return 0;
+        return Double.compare(o1.getX(), o2.getX());
     }
 }

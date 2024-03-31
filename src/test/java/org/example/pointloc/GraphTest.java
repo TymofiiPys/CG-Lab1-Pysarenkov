@@ -8,48 +8,48 @@ import java.util.Vector;
 
 public class GraphTest extends TestCase {
 
-    public ArrayList<GraphNode> getNodes() {
-        ArrayList<GraphNode> nodes = new ArrayList<>();
-        nodes.add(new GraphNode(new Point2D.Float(1, 8)));
-        nodes.add(new GraphNode(new Point2D.Float(2, 4)));
-        nodes.add(new GraphNode(new Point2D.Float(3, 1)));
-        nodes.add(new GraphNode(new Point2D.Float(4.5f, 4.5f)));
-        nodes.add(new GraphNode(new Point2D.Float(5, 6.5f)));
-        nodes.add(new GraphNode(new Point2D.Float(5.5f, 9)));
-        nodes.add(new GraphNode(new Point2D.Float(8, 7)));
-        nodes.add(new GraphNode(new Point2D.Float(8.5f, 6)));
-        nodes.add(new GraphNode(new Point2D.Float(9, 2)));
+    public ArrayList<Point2D.Float> getNodes() {
+        ArrayList<Point2D.Float> nodes = new ArrayList<>();
+        //in comments - indices when sorted
+        nodes.add(new Point2D.Float(1, 8)); // 7
+        nodes.add(new Point2D.Float(2, 4)); // 2
+        nodes.add(new Point2D.Float(3, 1)); // 0
+        nodes.add(new Point2D.Float(4.5f, 4.5f)); // 3
+        nodes.add(new Point2D.Float(5, 6.5f)); // 5
+        nodes.add(new Point2D.Float(5.5f, 9)); // 8
+        nodes.add(new Point2D.Float(8, 7)); // 6
+        nodes.add(new Point2D.Float(8.5f, 6)); // 4
+        nodes.add(new Point2D.Float(9, 2)); // 1
         return nodes;
     }
 
-    public ArrayList<WeightedEdge> getEdges(GraphNode[] nodes) {
-        ArrayList<WeightedEdge>  edges = new ArrayList<>();
-
-        edges.add(new WeightedEdge(nodes[0], nodes[5]));
-        edges.add(new WeightedEdge(nodes[0], nodes[1]));
-        edges.add(new WeightedEdge(nodes[1], nodes[2]));
-        edges.add(new WeightedEdge(nodes[1], nodes[3]));
-        edges.add(new WeightedEdge(nodes[1], nodes[4]));
-        edges.add(new WeightedEdge(nodes[2], nodes[3]));
-        edges.add(new WeightedEdge(nodes[2], nodes[7]));
-        edges.add(new WeightedEdge(nodes[2], nodes[8]));
-        edges.add(new WeightedEdge(nodes[3], nodes[4]));
-        edges.add(new WeightedEdge(nodes[3], nodes[7]));
-        edges.add(new WeightedEdge(nodes[4], nodes[5]));
-        edges.add(new WeightedEdge(nodes[4], nodes[6]));
-        edges.add(new WeightedEdge(nodes[5], nodes[6]));
-        edges.add(new WeightedEdge(nodes[6], nodes[7]));
-        edges.add(new WeightedEdge(nodes[7], nodes[8]));
-        edges.add(new WeightedEdge(nodes[4], nodes[7]));
+    public ArrayList<Edge> getEdges(ArrayList<Point2D.Float> nodes) {
+        ArrayList<Edge> edges = new ArrayList<>();
+        //in comments - indices of src and dest points
+        edges.add(new Edge(nodes.get(0), nodes.get(5))); // 7 -> 8
+        edges.add(new Edge(nodes.get(0), nodes.get(1))); // 2 -> 7
+        edges.add(new Edge(nodes.get(1), nodes.get(2))); // 0 -> 2
+        edges.add(new Edge(nodes.get(1), nodes.get(3))); // 2 -> 3
+        edges.add(new Edge(nodes.get(1), nodes.get(4))); // 2 -> 5
+        edges.add(new Edge(nodes.get(2), nodes.get(3))); // 0 -> 3
+        edges.add(new Edge(nodes.get(2), nodes.get(7))); // 0 -> 4
+        edges.add(new Edge(nodes.get(2), nodes.get(8))); // 0 -> 1
+        edges.add(new Edge(nodes.get(3), nodes.get(4))); // 3 -> 5
+        edges.add(new Edge(nodes.get(3), nodes.get(7))); // 3 -> 4
+        edges.add(new Edge(nodes.get(4), nodes.get(5))); // 5 -> 8
+        edges.add(new Edge(nodes.get(4), nodes.get(6))); // 5 -> 6
+        edges.add(new Edge(nodes.get(5), nodes.get(6))); // 6 -> 8
+        edges.add(new Edge(nodes.get(6), nodes.get(7))); // 4 -> 6
+        edges.add(new Edge(nodes.get(7), nodes.get(8))); // 1 -> 4
+        edges.add(new Edge(nodes.get(4), nodes.get(7))); // 4 -> 5
 
         return edges;
     }
 
     public void testSortPoints() {
-        ArrayList<GraphNode> nodes = getNodes();
-        ArrayList<GraphNode> sortedNodes = new ArrayList<>();
-        sortedNodes.addAll(nodes);
-        sortedNodes.sort(new GraphNodeYComparator());
+        ArrayList<Point2D.Float> nodes = getNodes();
+        ArrayList<Point2D.Float> sortedNodes = new ArrayList<>(nodes);
+        sortedNodes.sort(new Point2DYComparator());
         assertEquals(nodes.get(0), sortedNodes.get(7));
         assertEquals(nodes.get(1), sortedNodes.get(2));
         assertEquals(nodes.get(2), sortedNodes.get(0));
@@ -62,36 +62,36 @@ public class GraphTest extends TestCase {
     }
 
     public void testWeightBalancing() {
-        GraphNode[] nodes = getNodes();
-        WeightedEdge[] edges = getEdges(nodes);
+        ArrayList<Point2D.Float> nodes = getNodes();
+        ArrayList<Edge> edges = getEdges(nodes);
 
         Graph gr = new Graph(nodes, edges);
 
         gr.weightBalancing();
-        WeightedEdge[] weightedEdges = gr.getEdges();
-        assertEquals(1, weightedEdges[0].getWeight());
-        assertEquals(3, weightedEdges[1].getWeight());
-        assertEquals(1, weightedEdges[2].getWeight());
-        assertEquals(1, weightedEdges[3].getWeight());
-        assertEquals(1, weightedEdges[4].getWeight());
-        assertEquals(1, weightedEdges[5].getWeight());
-        assertEquals(1, weightedEdges[6].getWeight());
-        assertEquals(1, weightedEdges[7].getWeight());
-        assertEquals(1, weightedEdges[8].getWeight());
-        assertEquals(1, weightedEdges[9].getWeight());
-        assertEquals(2, weightedEdges[10].getWeight());
-        assertEquals(1, weightedEdges[11].getWeight());
-        assertEquals(1, weightedEdges[12].getWeight());
-        assertEquals(3, weightedEdges[13].getWeight());
-        assertEquals(2, weightedEdges[14].getWeight());
-        assertEquals(1, weightedEdges[15].getWeight());
+        ArrayList<WeightedEdge> weightedEdges = gr.getEdges();
+        assertEquals(1, weightedEdges.get(0).getWeight());
+        assertEquals(1, weightedEdges.get(1).getWeight());
+        assertEquals(3, weightedEdges.get(2).getWeight());
+        assertEquals(1, weightedEdges.get(3).getWeight());
+        assertEquals(1, weightedEdges.get(4).getWeight());
+        assertEquals(1, weightedEdges.get(5).getWeight());
+        assertEquals(1, weightedEdges.get(6).getWeight());
+        assertEquals(1, weightedEdges.get(7).getWeight());
+        assertEquals(1, weightedEdges.get(8).getWeight());
+        assertEquals(1, weightedEdges.get(9).getWeight());
+        assertEquals(3, weightedEdges.get(10).getWeight());
+        assertEquals(1, weightedEdges.get(11).getWeight());
+        assertEquals(2, weightedEdges.get(12).getWeight());
+        assertEquals(1, weightedEdges.get(13).getWeight());
+        assertEquals(1, weightedEdges.get(14).getWeight());
+        assertEquals(2, weightedEdges.get(15).getWeight());
     }
 
     public void testGetChains() {
-        Point2D.Float[] points = getPoints();
-        WeightedEdge[] edges = getEdges(points);
+        ArrayList<Point2D.Float> nodes = getNodes();
+        ArrayList<Edge> edges = getEdges(nodes);
 
-        Graph gr = new Graph(points, edges);
+        Graph gr = new Graph(nodes, edges);
         boolean thrown = false;
         try {
             gr.getChains();

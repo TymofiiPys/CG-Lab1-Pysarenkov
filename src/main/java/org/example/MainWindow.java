@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.GUI.GraphDrawer;
 import org.example.GUI.Lab1MenuBar;
 
 import javax.swing.*;
@@ -21,6 +22,8 @@ public class MainWindow extends Container {
     private JMenuBar menuBar;
     public final Dimension mainWindowDims = new Dimension(600, 500);
 
+    public final GraphDrawer graphDrawer;
+
     public MainWindow(){
         drawSmthButton.setText("Малюй");
         drawSmthButton.addActionListener(e -> {
@@ -35,6 +38,7 @@ public class MainWindow extends Container {
                 gr.drawString("ЧІНАЗЕС", 228, 228);
             }
         });
+        graphDrawer = new GraphDrawer(graphicsPanel);
     }
     public void setJMenuBar(JMenuBar menuBar) {
         this.menuBar = menuBar;

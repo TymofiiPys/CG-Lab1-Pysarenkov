@@ -1,10 +1,10 @@
 package org.example.GUI;
 
 import org.example.MainWindow;
+import org.example.pointloc.Graph;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
 import java.io.File;
 
 public class Lab1MenuBar extends JMenuBar {
@@ -25,9 +25,8 @@ public class Lab1MenuBar extends JMenuBar {
             }
         };
         openMI.addActionListener(new OpenFileDialogActionListener(parent, textFilesFilter, filePath, () -> {
-            JPanel graphicsPanel = mw.getGraphicsPanel();
-            Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
-            gr.drawString(filePath.toString(), 400, 400);
+            mw.graphDrawer.setGraph(Graph.readFromFile(filePath.toString()));
+            mw.graphDrawer.drawGraph();
         }));
         fileMenu.add(openMI);
         this.add(fileMenu);

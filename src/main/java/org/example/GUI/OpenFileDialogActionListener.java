@@ -25,6 +25,7 @@ public class OpenFileDialogActionListener implements ActionListener {
         JFileChooser openFileDialog = new JFileChooser();
         openFileDialog.setDialogTitle("Відкрити файл...");
         openFileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
+        openFileDialog.setCurrentDirectory(new File(System.getProperty("user.dir")));
         if(filter != null) openFileDialog.addChoosableFileFilter(filter);
         int result = openFileDialog.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
