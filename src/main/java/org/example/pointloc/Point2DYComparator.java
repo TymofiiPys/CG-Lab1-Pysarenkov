@@ -1,11 +1,12 @@
 package org.example.pointloc;
 
+import java.awt.geom.Point2D;
 import java.util.Comparator;
 
-public class GraphNodeYComparator implements Comparator<GraphNode> {
+public class Point2DYComparator implements Comparator<Point2D> {
 
     @Override
-    public int compare(GraphNode o1, GraphNode o2) {
+    public int compare(Point2D o1, Point2D o2) {
         if(o1.getY() > o2.getY())
             return 1;
         if(o1.getY() < o2.getY())
