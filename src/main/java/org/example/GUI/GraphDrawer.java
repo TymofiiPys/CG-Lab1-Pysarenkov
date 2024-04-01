@@ -18,21 +18,15 @@ import java.util.Vector;
  */
 public class GraphDrawer {
     private Graph graph;
-    private Graphics2D graphics;
     private final JPanel panelDraw;
     private final int nodesRad = 4;
-    private final int textXOffset = -25;
-    private final float arrowSticksLength = 12;
-    private final double arrowSticksAngle = 20;
     private int layer = 0;
-    private int colorSeed = 0;
 
     /**
      * @param panelDraw a {@code JPanel} on which graphs will be drawn
      */
     public GraphDrawer(JPanel panelDraw) {
         this.panelDraw = panelDraw;
-        this.graphics = (Graphics2D) panelDraw.getGraphics();
     }
 
     /**
@@ -92,8 +86,8 @@ public class GraphDrawer {
             Point2D.Float adapted = adaptToPanel(node);
             gr.fillOval((int) (adapted.x - nodesRad),
                     (int) (adapted.y - nodesRad),
-                    (int) (2 * nodesRad),
-                    (int) (2 * nodesRad));
+                    2 * nodesRad,
+                    2 * nodesRad);
         }
         layer = 0;
     }
@@ -106,10 +100,12 @@ public class GraphDrawer {
         //minus because jpanel's origin is on left top, not bottom
         float tangent = -(pt1.y - pt2.y) / (pt1.x - pt2.x);
         double angle = Math.atan(tangent);
+        double arrowSticksAngle = 20;
         double angle1 = angle + Math.toRadians(arrowSticksAngle);
         double angle2 = angle - Math.toRadians(arrowSticksAngle);
         int mult1 = angle < 0 ? -1 : 1;
         int mult2 = angle < 0 ? -1 : 1;
+        float arrowSticksLength = 12;
         int x1 = (int) (pt2.x - arrowSticksLength * mult1 * Math.cos(angle1));
         int y1 = (int) (pt2.y + arrowSticksLength * mult1 * Math.sin(angle1));
         int x2 = (int) (pt2.x - arrowSticksLength * mult2 * Math.cos(angle2));
@@ -139,13 +135,13 @@ public class GraphDrawer {
         layer++;
         drawGraph(drawEdges);
         ArrayList<Point2D.Float> nodes = graph.getNodes();
-        int[] offsets = offsets();
         int k = 0;
         for (Point2D.Float node : nodes) {
             Point2D.Float adapted = adaptToPanel(node);
+            int textXOffset = -25;
             gr.drawString(k++ + "", (int) adapted.x + textXOffset, (int) adapted.y);
         }
-        graph.getEdges().stream().forEach(this::drawDirectionsOnEdge);
+        graph.getEdges().forEach(this::drawDirectionsOnEdge);
     }
 
     public void drawChains() {
@@ -155,6 +151,7 @@ public class GraphDrawer {
         graph.weightBalancing();
         Vector<ArrayList<WeightedEdge>> chains = (Vector<ArrayList<WeightedEdge>>) graph.getChains().clone();
         gr.setStroke(new BasicStroke(2.0f));
+        int colorSeed = 0;
         Random colorRand = new Random(colorSeed);
         for (ArrayList<WeightedEdge> chain : chains.reversed()) {
             gr.setColor(

@@ -93,8 +93,11 @@ public class Graph {
      */
     public static Graph readFromFile(String filename) {
         Stream<String> fileLines;
+        List<String> lines;
         try {
             fileLines = Files.lines(Paths.get(filename));
+            lines = fileLines.toList();
+            fileLines.close();
         } catch (IOException e) {
             throw new RuntimeException("Literally impossible to get this one, man", e);
         }
@@ -105,7 +108,7 @@ public class Graph {
         float x, y;
         int pt1, pt2;
         boolean readEdges = false;
-        for (String line : fileLines.toList()) {
+        for (String line : lines) {
             if (line.isEmpty()) {
                 readEdges = true;
                 continue;
@@ -245,15 +248,6 @@ public class Graph {
         return false;
     }
 
-    private int findInd(Point2D.Float pointToFind) {
-        for (int i = 0; i < N; i++) {
-            if (nodes.get(i).equals(pointToFind)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public Vector<ArrayList<WeightedEdge>> getChains() {
         if (!balanced) {
             throw new RuntimeException("The graph must be balanced first!");
@@ -281,7 +275,6 @@ public class Graph {
                 curChain.add(edgeToAdd);
                 weightsCopy[edgeIndex]--;
                 curSource = nodes.indexOf(edgeToAdd.getDest());
-//                curSource = findInd(edgeToAdd.getDest());
             }
             chains.add(curChain);
             curSource = 0;
@@ -300,7 +293,6 @@ public class Graph {
      */
     public int[] pointLocation(Point2D.Float point) {
         int[] chainsBetween = new int[]{-1, -1};
-        int k = 0;
         for (int i = 0; i < chains.size(); i++) {
             var curChain = chains.get(i);
             for (WeightedEdge weightedEdge : curChain) {

@@ -24,7 +24,6 @@ public class MainWindow extends Container {
     private JPanel controlsInsidePanel;
     public JButton showDirGrButton;
     public JButton showChainsButton;
-    private JMenuBar menuBar;
     public final Dimension mainWindowDims = new Dimension(600, 500);
 
     public final GraphDrawer graphDrawer;
@@ -33,15 +32,9 @@ public class MainWindow extends Container {
         drawSmthButton.setText("Локалізація точки");
         showDirGrButton.setText("<html> <center> Показати орієнтований <br> граф <br> і номери вершин </center> </html>");
         graphDrawer = new GraphDrawer(graphicsPanel);
-//        MainWindow mw = this;
         drawSmthButton.addActionListener(e -> {
-            Point2D.Float p = new Point2D.Float(
-                    Float.parseFloat(contrPanXTextField.getText()),
-                    Float.parseFloat(contrPanYTextField.getText())
-            );
-            graphDrawer.drawPoint(
-                    graphDrawer.adaptToPanel(p)
-            );
+            Point2D.Float p = new Point2D.Float(Float.parseFloat(contrPanXTextField.getText()), Float.parseFloat(contrPanYTextField.getText()));
+            graphDrawer.drawPoint(graphDrawer.adaptToPanel(p));
             int[] chains = graphDrawer.pointLocation(p);
             JDialog dialog = new JDialog();
             dialog.setTitle("");
@@ -53,21 +46,14 @@ public class MainWindow extends Container {
             dialog.setVisible(true);
         });
         showDirGrButton.setEnabled(false);
-        showDirGrButton.addActionListener(e -> {
-            graphDrawer.drawDirectedEnumeratedGraph(true);
-        });
+        showDirGrButton.addActionListener(e -> graphDrawer.drawDirectedEnumeratedGraph(true));
         showChainsButton.setEnabled(false);
-        showChainsButton.addActionListener(e -> {
-            graphDrawer.drawChains();
-        });
+        showChainsButton.addActionListener(e -> graphDrawer.drawChains());
         graphicsPanel.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-//                Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
-//                gr.drawString("ЧІНАЗЕС", 228, 228);
-                if (graphDrawer.graphSet())
-                    graphDrawer.drawDirectedEnumeratedGraph(true);
+                if (graphDrawer.graphSet()) graphDrawer.drawDirectedEnumeratedGraph(true);
             }
         });
         graphicsPanel.addMouseListener(new MouseAdapter() {
@@ -86,20 +72,11 @@ public class MainWindow extends Container {
         });
     }
 
-    public void setJMenuBar(JMenuBar menuBar) {
-        this.menuBar = menuBar;
-    }
-
-    public JPanel getGraphicsPanel() {
-        return graphicsPanel;
-    }
-
     public static void main(String[] args) {
         JFrame frame = new JFrame("ЛР№1. Локалізація точки методом ланцюгів");
         MainWindow mw = new MainWindow();
         Lab1MenuBar menuBar = new Lab1MenuBar(frame, mw);
         frame.setJMenuBar(menuBar);
-        mw.setJMenuBar(menuBar);
         frame.setContentPane(mw.mainPanel);
         frame.setMinimumSize(mw.mainWindowDims);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

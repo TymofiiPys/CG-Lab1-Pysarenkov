@@ -26,10 +26,6 @@ public class EdgeDestXComparator implements Comparator<Integer> {
                 o1point.x > src.x ? Float.POSITIVE_INFINITY : Float.NEGATIVE_INFINITY;
         float tangent2 = (o2point.y - src.y) != 0 ? (o2point.x - src.x) / (o2point.y - src.y) :
                 o2point.x > src.x ? Float.POSITIVE_INFINITY : Float.NEGATIVE_INFINITY;
-        if (tangent1 > tangent2)
-            return 1;
-        if (tangent1 < tangent2)
-            return -1;
-        return 0;
+        return Float.compare(tangent1, tangent2);
     }
 }
