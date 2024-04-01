@@ -19,6 +19,7 @@ public class MainWindow extends Container {
     private JLabel contrPanYLabel;
     private JTextField contrPanYTextField;
     private JPanel controlsInsidePanel;
+    public JButton showDirGrButton;
     private JMenuBar menuBar;
     public final Dimension mainWindowDims = new Dimension(600, 500);
 
@@ -26,19 +27,26 @@ public class MainWindow extends Container {
 
     public MainWindow(){
         drawSmthButton.setText("Малюй");
+        showDirGrButton.setText("<html> <center> Показати орієнтований <br> граф <br> і номери вершин </center> </html>");
+        graphDrawer = new GraphDrawer(graphicsPanel);
         drawSmthButton.addActionListener(e -> {
             Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
             gr.drawString("ЧІНАЗЕС", 228, 228);
+        });
+        showDirGrButton.setEnabled(false);
+        showDirGrButton.addActionListener(e -> {
+            graphDrawer.drawDirectedEnumeratedGraph();
         });
         graphicsPanel.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-                Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
-                gr.drawString("ЧІНАЗЕС", 228, 228);
+//                Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
+//                gr.drawString("ЧІНАЗЕС", 228, 228);
+                if(graphDrawer.graphSet())
+                    graphDrawer.drawDirectedEnumeratedGraph();
             }
         });
-        graphDrawer = new GraphDrawer(graphicsPanel);
     }
     public void setJMenuBar(JMenuBar menuBar) {
         this.menuBar = menuBar;
