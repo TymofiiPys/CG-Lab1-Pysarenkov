@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 
 public class MainWindow extends Container {
     private JButton drawSmthButton;
@@ -25,13 +28,19 @@ public class MainWindow extends Container {
 
     public final GraphDrawer graphDrawer;
 
-    public MainWindow(){
-        drawSmthButton.setText("Малюй");
+    public MainWindow() {
+        drawSmthButton.setText("Локалізація точки");
         showDirGrButton.setText("<html> <center> Показати орієнтований <br> граф <br> і номери вершин </center> </html>");
         graphDrawer = new GraphDrawer(graphicsPanel);
         drawSmthButton.addActionListener(e -> {
-            Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
-            gr.drawString("ЧІНАЗЕС", 228, 228);
+            Point2D.Float p = new Point2D.Float(
+                    Float.parseFloat(contrPanXTextField.getText()),
+                    Float.parseFloat(contrPanYTextField.getText())
+            );
+            graphDrawer.drawPoint(
+                    graphDrawer.adaptToPanel(p)
+            );
+            graphDrawer.pointLocation(p);
         });
         showDirGrButton.setEnabled(false);
         showDirGrButton.addActionListener(e -> {
@@ -43,17 +52,33 @@ public class MainWindow extends Container {
                 super.componentResized(e);
 //                Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
 //                gr.drawString("ЧІНАЗЕС", 228, 228);
-                if(graphDrawer.graphSet())
+                if (graphDrawer.graphSet())
                     graphDrawer.drawDirectedEnumeratedGraph();
             }
         });
+        graphicsPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (graphDrawer.graphSet()) {
+                    graphDrawer.drawDirectedEnumeratedGraph();
+                    graphDrawer.drawPoint(e.getPoint());
+                    Point2D.Float pointOnGraph = graphDrawer.adaptFromPanel(new Point2D.Float(e.getX(), e.getY()));
+                    contrPanXTextField.setText(pointOnGraph.x + "");
+                    contrPanYTextField.setText(pointOnGraph.y + "");
+                }
+            }
+        });
     }
+
     public void setJMenuBar(JMenuBar menuBar) {
         this.menuBar = menuBar;
     }
+
     public JPanel getGraphicsPanel() {
         return graphicsPanel;
     }
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("ЛР№1. Локалізація точки методом ланцюгів");
         MainWindow mw = new MainWindow();

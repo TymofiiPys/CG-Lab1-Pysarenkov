@@ -58,8 +58,14 @@ public class GraphDrawer {
         return new Point2D.Float(p.x + offsets[0], panelDraw.getHeight() - (p.y + offsets[1]));
     }
 
+    public Point2D.Float adaptFromPanel(Point2D.Float p) {
+        int[] offsets = offsets();
+        return new Point2D.Float(p.x - offsets[0], panelDraw.getHeight() - (p.y + offsets[1]));
+    }
+
     public void drawGraph() {
         Graphics2D gr = (Graphics2D) panelDraw.getGraphics();
+        gr.clearRect(0, 0, panelDraw.getWidth(), panelDraw.getHeight());
         ArrayList<WeightedEdge> edges = graph.getEdges();
         int[] offsets = offsets();
         //axes
@@ -86,17 +92,20 @@ public class GraphDrawer {
 
     public void drawDirectionsOnEdge(Edge edge) {
         Graphics2D gr = (Graphics2D) panelDraw.getGraphics();
+        gr.setColor(Color.decode("#3d823f"));
         Point2D.Float pt1 = adaptToPanel(edge.getSrc());
         Point2D.Float pt2 = adaptToPanel(edge.getDest());
         //minus because jpanel's origin is on left top, not bottom
-        float tangent = -(pt1.y - pt2.y) / (pt1.x - pt2.x);
+        float tangent = - (pt1.y - pt2.y) / (pt1.x - pt2.x);
         double angle = Math.atan(tangent);
         double angle1 = angle + Math.toRadians(arrowSticksAngle);
         double angle2 = angle - Math.toRadians(arrowSticksAngle);
-        int x1 = (int) (pt2.x - arrowSticksLength * Math.cos(angle1));
-        int y1 = (int) (pt2.y + arrowSticksLength * Math.sin(angle1));
-        int x2 = (int) (pt2.x - arrowSticksLength * Math.cos(angle2));
-        int y2 = (int) (pt2.y + arrowSticksLength * Math.sin(angle2));
+        int mult1 = angle < 0 ? -1 : 1;
+        int mult2 = angle < 0 ? -1 : 1;
+        int x1 = (int) (pt2.x - arrowSticksLength * mult1 * Math.cos(angle1));
+        int y1 = (int) (pt2.y + arrowSticksLength * mult1  * Math.sin(angle1));
+        int x2 = (int) (pt2.x - arrowSticksLength * mult2 *  Math.cos(angle2));
+        int y2 = (int) (pt2.y + arrowSticksLength * mult2 * Math.sin(angle2));
 //        gr.drawLine((int) pt2.x,
 //                (int) pt2.y,
 //                (int) (pt2.x + arrowSticksLength * Math.cos(angle + Math.toRadians(arrowSticksAngle))),
@@ -126,6 +135,16 @@ public class GraphDrawer {
             gr.drawString(k++ + "", (int) adapted.x + textXOffset, (int) adapted.y);
         }
         graph.getEdges().stream().forEach(this::drawDirectionsOnEdge);
+    }
+
+    public void drawPoint(Point2D p) {
+        Graphics2D gr = (Graphics2D) panelDraw.getGraphics();
+        gr.setColor(Color.BLUE);
+        gr.fillOval((int) p.getX() - nodesRad, (int) p.getY() - nodesRad, 2 * nodesRad, 2 * nodesRad);
+    }
+
+    public void pointLocation(Point2D.Float p) {
+
     }
 
     public boolean graphSet() {
