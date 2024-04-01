@@ -258,7 +258,9 @@ public class Graph {
         if (!balanced) {
             throw new RuntimeException("The graph must be balanced first!");
         }
-
+        if(chainsFound) {
+            return chains;
+        }
         // weights are copied to a separate array
         // so that weights in edges array are not changed
         int[] weightsCopy = new int[edges.size()];
@@ -311,18 +313,18 @@ public class Graph {
                             - point.getX() * dest.getY()
                             - src.getX() * point.getY()
                             - dest.getX() * src.getY();
-                    if (k == 0 && doubledSquare < 0) {
-                        chainsBetween[k++] = i;
+                    if (doubledSquare < 0) {
+                        chainsBetween[0] = i;
                         continue;
                     }
-                    if (k == 1 && doubledSquare > 0) {
-                        chainsBetween[k] = i;
+                    if (doubledSquare > 0) {
+                        chainsBetween[1] = i;
                         return chainsBetween;
                     }
-                    if (k == 0 && doubledSquare == 0) {
-                        chainsBetween[k] = i;
-                        return chainsBetween;
-                    }
+//                    if (k == 0 && doubledSquare == 0) {
+//                        chainsBetween[k] = i;
+//                        return chainsBetween;
+//                    }
                 }
             }
         }

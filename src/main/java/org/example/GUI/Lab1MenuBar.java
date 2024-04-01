@@ -27,7 +27,8 @@ public class Lab1MenuBar extends JMenuBar {
         openMI.addActionListener(new OpenFileDialogActionListener(parent, textFilesFilter, filePath, () -> {
             mw.graphDrawer.setGraph(Graph.readFromFile(filePath.toString()));
             mw.showDirGrButton.setEnabled(true);
-            mw.graphDrawer.drawGraph();
+            mw.showChainsButton.setEnabled(true);
+            mw.graphDrawer.drawGraph(true);
         }));
         fileMenu.add(openMI);
         this.add(fileMenu);

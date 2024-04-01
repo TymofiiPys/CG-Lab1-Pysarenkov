@@ -23,6 +23,7 @@ public class MainWindow extends Container {
     private JTextField contrPanYTextField;
     private JPanel controlsInsidePanel;
     public JButton showDirGrButton;
+    public JButton showChainsButton;
     private JMenuBar menuBar;
     public final Dimension mainWindowDims = new Dimension(600, 500);
 
@@ -32,6 +33,7 @@ public class MainWindow extends Container {
         drawSmthButton.setText("Локалізація точки");
         showDirGrButton.setText("<html> <center> Показати орієнтований <br> граф <br> і номери вершин </center> </html>");
         graphDrawer = new GraphDrawer(graphicsPanel);
+//        MainWindow mw = this;
         drawSmthButton.addActionListener(e -> {
             Point2D.Float p = new Point2D.Float(
                     Float.parseFloat(contrPanXTextField.getText()),
@@ -40,11 +42,23 @@ public class MainWindow extends Container {
             graphDrawer.drawPoint(
                     graphDrawer.adaptToPanel(p)
             );
-            graphDrawer.pointLocation(p);
+            int[] chains = graphDrawer.pointLocation(p);
+            JDialog dialog = new JDialog();
+            dialog.setTitle("");
+            JLabel label = new JLabel("<html><center>Точка знаходиться між ланцюгами " + chains[0] + " і " + chains[1] + "</center></html>");
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            dialog.add(label);
+            dialog.setSize(100, 100);
+            dialog.setResizable(true);
+            dialog.setVisible(true);
         });
         showDirGrButton.setEnabled(false);
         showDirGrButton.addActionListener(e -> {
-            graphDrawer.drawDirectedEnumeratedGraph();
+            graphDrawer.drawDirectedEnumeratedGraph(true);
+        });
+        showChainsButton.setEnabled(false);
+        showChainsButton.addActionListener(e -> {
+            graphDrawer.drawChains();
         });
         graphicsPanel.addComponentListener(new ComponentAdapter() {
             @Override
@@ -53,7 +67,7 @@ public class MainWindow extends Container {
 //                Graphics2D gr = (Graphics2D) graphicsPanel.getGraphics();
 //                gr.drawString("ЧІНАЗЕС", 228, 228);
                 if (graphDrawer.graphSet())
-                    graphDrawer.drawDirectedEnumeratedGraph();
+                    graphDrawer.drawDirectedEnumeratedGraph(true);
             }
         });
         graphicsPanel.addMouseListener(new MouseAdapter() {
@@ -61,7 +75,8 @@ public class MainWindow extends Container {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (graphDrawer.graphSet()) {
-                    graphDrawer.drawDirectedEnumeratedGraph();
+                    graphDrawer.drawDirectedEnumeratedGraph(true);
+                    graphDrawer.drawChains();
                     graphDrawer.drawPoint(e.getPoint());
                     Point2D.Float pointOnGraph = graphDrawer.adaptFromPanel(new Point2D.Float(e.getX(), e.getY()));
                     contrPanXTextField.setText(pointOnGraph.x + "");
