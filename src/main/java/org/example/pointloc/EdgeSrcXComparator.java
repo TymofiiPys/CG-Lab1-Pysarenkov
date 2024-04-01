@@ -21,10 +21,15 @@ public class EdgeSrcXComparator implements Comparator<Integer> {
     public int compare(Integer o1, Integer o2) {
         Point2D.Float o1point = edges.get(o1).getSrc();
         Point2D.Float o2point = edges.get(o2).getSrc();
-        if (o1point.getX() > o2point.getX())
-            return 1;
-        if (o1point.getX() < o2point.getX())
+        Point2D.Float dest = edges.get(o1).getDest();
+        float tangent1 = (o1point.y - dest.y) != 0 ? (o1point.x - dest.x) / (o1point.y - dest.y) :
+                o1point.x > dest.x ? Float.POSITIVE_INFINITY : Float.NEGATIVE_INFINITY;
+        float tangent2 = (o2point.y - dest.y) != 0 ? (o2point.x - dest.x) / (o2point.y - dest.y) :
+                o2point.x > dest.x ? Float.POSITIVE_INFINITY : Float.NEGATIVE_INFINITY;
+        if (tangent1 > tangent2)
             return -1;
-        return Double.compare(o1point.getY(), o2point.getY());
+        if (tangent1 < tangent2)
+            return 1;
+        return 0;
     }
 }
