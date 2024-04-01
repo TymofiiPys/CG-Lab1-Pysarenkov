@@ -82,6 +82,15 @@ public class Graph {
         System.out.println();
     }
 
+    /**
+     * Read a graph from file. File should be in such format that nodes go first and described by
+     * two float numbers (coordinates), one line per node.
+     * To finish reading nodes, file should contain an empty line, after which goes list of edges.
+     * Edges are described by two integers (source and destination indices in read list).
+     *
+     * @param filename path to the file containing graph properties
+     * @return Graph object read from the file
+     */
     public static Graph readFromFile(String filename) {
         Stream<String> fileLines;
         try {
@@ -89,6 +98,7 @@ public class Graph {
         } catch (IOException e) {
             throw new RuntimeException("Literally impossible to get this one, man", e);
         }
+
         ArrayList<Point2D.Float> nodes = new ArrayList<>();
         ArrayList<Edge> edges = new ArrayList<>();
         Scanner lineScanner;
@@ -123,9 +133,19 @@ public class Graph {
                 }
             }
         }
+
         return new Graph(nodes, edges);
     }
 
+    /**
+     * Add edge index to list of outgoing edges from srcNodeIndex-th node
+     * and to list of incoming edges to destNodeIndex-th node
+     * Lists are sorted after addition.
+     *
+     * @param srcNodeIndex  index of source node for the edge
+     * @param destNodeIndex index of destination node for the edge
+     * @param edgeIndex     index of the added edge
+     */
     private void addToNodeLists(int srcNodeIndex, int destNodeIndex, int edgeIndex) {
         outgoingEdgeIndices.get(srcNodeIndex).add(edgeIndex);
         incomingEdgeIndices.get(destNodeIndex).add(edgeIndex);
@@ -162,6 +182,11 @@ public class Graph {
         return edges.get(outgoingEdgeIndices.get(out).get(0));
     }
 
+    /**
+     * @param out     index of node
+     * @param weights weights of edges
+     * @return the leftmost edge with positive weight index outgoing from out-th node
+     */
     private int leftMostEdgeIndFromPoint(int out, int[] weights) {
         for (int index : outgoingEdgeIndices.get(out)) {
             if (weights[index] > 0) {
@@ -175,6 +200,10 @@ public class Graph {
         return edges.get(incomingEdgeIndices.get(to).get(0));
     }
 
+    /**
+     * Does graph weight-balancing using information about
+     * incoming and outgoing edges from each node except the first and the last
+     */
     public void weightBalancing() {
         for (var edge : edges) {
             edge.setWeight(1);
@@ -203,6 +232,10 @@ public class Graph {
         balanced = true;
     }
 
+    /**
+     * @param weights edge weights
+     * @return true if there are positive weight edges outgoing from first node
+     */
     private boolean presentEdgesFrom0(int[] weights) {
         for (int index : outgoingEdgeIndices.get(0)) {
             if (weights[index] > 0) {
@@ -245,7 +278,8 @@ public class Graph {
                 edgeToAdd = edges.get(edgeIndex);
                 curChain.add(edgeToAdd);
                 weightsCopy[edgeIndex]--;
-                curSource = findInd(edgeToAdd.getDest());
+                curSource = nodes.indexOf(edgeToAdd.getDest());
+//                curSource = findInd(edgeToAdd.getDest());
             }
             chains.add(curChain);
             curSource = 0;
@@ -257,6 +291,11 @@ public class Graph {
         return chains;
     }
 
+    /**
+     * find between which chains lies the point
+     * @param point point to locate
+     * @return indices of chains between which lies the point
+     */
     public int[] pointLocation(Point2D.Float point) {
         int[] chainsBetween = new int[]{-1, -1};
         int k = 0;

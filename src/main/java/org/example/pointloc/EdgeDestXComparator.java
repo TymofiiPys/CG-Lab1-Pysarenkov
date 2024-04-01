@@ -4,9 +4,15 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * Class for comparing edges by their destinations' x coordinates
+ */
 public class EdgeDestXComparator implements Comparator<Integer> {
     private final ArrayList<WeightedEdge> edges;
 
+    /**
+     * @param edges edges whose indices will be sorted
+     */
     public EdgeDestXComparator(ArrayList<WeightedEdge> edges) {
         this.edges = edges;
     }
