@@ -252,6 +252,27 @@ public class Graph {
     private void checkChainMethodApplicability() {
         // Graph chains must be monotonous relative to a line.
         // For simplicity, Y axis is chosen to be this line
+
+        // TODO: Check for method applicability when the graph has a node
+        //   higher than 0th but can't be reached
+        for (int i = 1; i < nodes.size(); i++) {
+            if (incomingEdgeIndices.get(i).isEmpty()) {
+                isChainsMethodApplicable = false;
+                return;
+            }
+        }
+        // TODO: When the graph is disjoint
+        // answer: if the graph is disjoint then some other node has no incoming
+        // edges, which is checked above
+
+        // TODO: when the graph has a node lower than nth but has no outgoing
+        //  edges
+        for (int i = 0; i < nodes.size() - 1; i++) {
+            if (outgoingEdgeIndices.get(i).isEmpty()) {
+                isChainsMethodApplicable = false;
+                return;
+            }
+        }
         Point2D.Float prevPoint;
         for (ArrayList<WeightedEdge> chain : chains) {
             prevPoint = chain.getFirst().getSrc();
