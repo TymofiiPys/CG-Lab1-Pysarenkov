@@ -29,9 +29,10 @@ public class Graph {
      * ith element corresponds to list of outgoing edge indices for ith node.
      */
     private final ArrayList<LinkedList<Integer>> outgoingEdgeIndices;
-    private Vector<ArrayList<WeightedEdge>> chains;
+    private ArrayList<ArrayList<WeightedEdge>> chains;
     private boolean balanced = false;
     private boolean chainsFound = false;
+    private Boolean isChainsMethodApplicable = null;
 
     public Graph(ArrayList<Point2D.Float> nodes, ArrayList<Edge> edges) {
         if (nodes == null) {
@@ -248,11 +249,45 @@ public class Graph {
         return false;
     }
 
-    public Vector<ArrayList<WeightedEdge>> getChains() {
+    private void checkChainMethodApplicability() {
+        // Graph chains must be monotonous relative to a line.
+        // For simplicity, Y axis is chosen to be this line
+        Point2D.Float prevPoint;
+        for (ArrayList<WeightedEdge> chain : chains) {
+            prevPoint = chain.getFirst().getSrc();
+            for (WeightedEdge edge : chain) {
+                if (edge.getDest().y < prevPoint.y) {
+                    isChainsMethodApplicable = false;
+                    return;
+                }
+                prevPoint = edge.getDest();
+            }
+        }
+
+        // Moreover, for any pair of chains Ci and Cj,
+        // all of Ci's nodes which are not Cj's nodes
+        // must be on the same side relative to Cj.
+        // To check that, search for intersections between edges
+        for (int i = 0; i < chains.size(); i++) {
+            for (int j = i + 1; j < chains.size(); j++) {
+                for (WeightedEdge edgeI : chains.get(i)) {
+                    for (WeightedEdge edgeJ : chains.get(j)) {
+                        if (edgeI.intersect(edgeJ)) {
+                            isChainsMethodApplicable = false;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        isChainsMethodApplicable = true;
+    }
+
+    public ArrayList<ArrayList<WeightedEdge>> getChains() {
         if (!balanced) {
             throw new RuntimeException("The graph must be balanced first!");
         }
-        if(chainsFound) {
+        if (chainsFound) {
             return chains;
         }
         // weights are copied to a separate array
@@ -263,7 +298,7 @@ public class Graph {
             weightsCopy[k++] = edge.getWeight();
         }
 
-        Vector<ArrayList<WeightedEdge>> chains = new Vector<>();
+        ArrayList<ArrayList<WeightedEdge>> chains = new ArrayList<>();
         ArrayList<WeightedEdge> curChain;
         int curSource = 0;
         WeightedEdge edgeToAdd;
@@ -282,16 +317,24 @@ public class Graph {
         if (!chains.isEmpty()) {
             chainsFound = true;
             this.chains = chains;
+            checkChainMethodApplicability();
         }
         return chains;
     }
 
     /**
      * find between which chains lies the point
+     *
      * @param point point to locate
      * @return indices of chains between which lies the point
      */
     public int[] pointLocation(Point2D.Float point) {
+        if (isChainsMethodApplicable == null) {
+            throw new RuntimeException("Chains not found yet.");
+        }
+        if (!isChainsMethodApplicable) {
+            throw new RuntimeException("Chain method is not applicable to the graph.");
+        }
         int[] chainsBetween = new int[]{-1, -1};
         for (int i = 0; i < chains.size(); i++) {
             var curChain = chains.get(i);
@@ -321,6 +364,10 @@ public class Graph {
             }
         }
         return chainsBetween;
+    }
+
+    public Boolean getIsChainsMethodApplicable() {
+        return isChainsMethodApplicable;
     }
 
     public ArrayList<WeightedEdge> getEdges() {

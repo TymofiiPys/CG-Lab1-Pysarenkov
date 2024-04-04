@@ -12,7 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 public class MainWindow extends Container {
-    private JButton drawSmthButton;
+    public JButton pointLocButton;
     private JPanel mainPanel;
     private JPanel controlsPanel;
     private JPanel graphicsPanel;
@@ -24,15 +24,25 @@ public class MainWindow extends Container {
     private JPanel controlsInsidePanel;
     public JButton showDirGrButton;
     public JButton showChainsButton;
+    public JLabel statusLabel;
     public final Dimension mainWindowDims = new Dimension(600, 500);
-
     public final GraphDrawer graphDrawer;
 
     public MainWindow() {
-        drawSmthButton.setText("Локалізація точки");
+        // button texts
+        pointLocButton.setText("Локалізація точки");
         showDirGrButton.setText("<html> <center> Показати орієнтований <br> граф <br> і номери вершин </center> </html>");
+        showChainsButton.setText("Показати ланцюги");
+
+        //
         graphDrawer = new GraphDrawer(graphicsPanel);
-        drawSmthButton.addActionListener(e -> {
+
+        pointLocButton.setEnabled(false);
+        showDirGrButton.setEnabled(false);
+        showChainsButton.setEnabled(false);
+
+        //button action listeners
+        pointLocButton.addActionListener(e -> {
             Point2D.Float p = new Point2D.Float(Float.parseFloat(contrPanXTextField.getText()), Float.parseFloat(contrPanYTextField.getText()));
             graphDrawer.drawPoint(graphDrawer.adaptToPanel(p));
             int[] chains = graphDrawer.pointLocation(p);
@@ -41,14 +51,14 @@ public class MainWindow extends Container {
             JLabel label = new JLabel("<html><center>Точка знаходиться між ланцюгами " + chains[0] + " і " + chains[1] + "</center></html>");
             label.setHorizontalAlignment(SwingConstants.CENTER);
             dialog.add(label);
-            dialog.setSize(100, 100);
+            dialog.setSize(200, 200);
             dialog.setResizable(true);
             dialog.setVisible(true);
         });
-        showDirGrButton.setEnabled(false);
         showDirGrButton.addActionListener(e -> graphDrawer.drawDirectedEnumeratedGraph(true));
-        showChainsButton.setEnabled(false);
         showChainsButton.addActionListener(e -> graphDrawer.drawChains());
+
+        //graphics panel listeners
         graphicsPanel.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {

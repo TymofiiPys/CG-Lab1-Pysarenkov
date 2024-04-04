@@ -29,6 +29,7 @@ public class OpenFileDialogActionListener implements ActionListener {
         if(filter != null) openFileDialog.addChoosableFileFilter(filter);
         int result = openFileDialog.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
+            openedFilePath.setLength(0);
             openedFilePath.append(openFileDialog.getSelectedFile().getAbsolutePath());
             taskToDoAfterOpening.run();
         }

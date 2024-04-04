@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import java.lang.Math.*;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Vector;
 
@@ -30,18 +31,25 @@ public class GraphDrawer {
     }
 
     /**
-     * Change graph to draw
+     * Change graph to draw and do all necessary operations for further point location
      *
      * @param gr a new graph
      */
     public void setGraph(Graph gr) {
         this.graph = gr;
+        graph.weightBalancing();
+        graph.getChains();
+    }
+
+    public Boolean graphChainMethodApplicable() {
+        if (graph == null) return null;
+        return graph.getIsChainsMethodApplicable();
     }
 
     /**
      * @return offsets which will be used to draw graph in the centre of panelDraw
      */
-    public int[] offsets() {
+    private int[] offsets() {
         Point2D.Float first = graph.getNodes().getFirst();
         Point2D.Float last = graph.getNodes().getLast();
         Point2D.Float center = new Point2D.Float((first.x + last.x) / 2, (first.y + last.y) / 2);
@@ -148,8 +156,15 @@ public class GraphDrawer {
         Graphics2D gr = (Graphics2D) panelDraw.getGraphics();
         gr.clearRect(0, 0, panelDraw.getWidth(), panelDraw.getHeight());
         layer = 1;
-        graph.weightBalancing();
-        Vector<ArrayList<WeightedEdge>> chains = (Vector<ArrayList<WeightedEdge>>) graph.getChains().clone();
+        ArrayList<ArrayList<WeightedEdge>> chainsOrig = graph.getChains();
+        ArrayList<ArrayList<WeightedEdge>> chains = new ArrayList<>();
+        for (var chain : chainsOrig) {
+            ArrayList<WeightedEdge> chainCopy = new ArrayList<>();
+            for (var edge : chain) {
+                chainCopy.add(new WeightedEdge(edge));
+            }
+            chains.add(chainCopy);
+        }
         gr.setStroke(new BasicStroke(2.0f));
         int colorSeed = 0;
         Random colorRand = new Random(colorSeed);
@@ -164,7 +179,7 @@ public class GraphDrawer {
             for (WeightedEdge edge : chain) {
                 Point2D.Float pt1 = adaptToPanel(edge.getSrc());
                 Point2D.Float pt2 = adaptToPanel(edge.getDest());
-                double tangent = Math.atan(-(pt2.y - pt1.y)/(pt2.x - pt1.x));
+                double tangent = Math.atan(-(pt2.y - pt1.y) / (pt2.x - pt1.x));
                 double sin = Math.sin(tangent);
                 double cos = Math.cos(tangent);
                 gr.drawLine((int) (pt1.x + 2 * (edge.getWeight() - 1)),
@@ -184,10 +199,7 @@ public class GraphDrawer {
     }
 
     public int[] pointLocation(Point2D.Float p) {
-        graph.weightBalancing();
-        graph.getChains();
-        int[] chains = graph.pointLocation(p);
-        return chains;
+        return graph.pointLocation(p);
     }
 
     public boolean graphSet() {

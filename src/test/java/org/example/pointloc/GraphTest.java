@@ -102,7 +102,7 @@ public class GraphTest extends TestCase {
         thrown = false;
         gr.weightBalancing();
 
-        Vector<ArrayList<WeightedEdge>> chains = null;
+        ArrayList<ArrayList<WeightedEdge>> chains = null;
         try {
             chains = gr.getChains();
         } catch (Exception e) {

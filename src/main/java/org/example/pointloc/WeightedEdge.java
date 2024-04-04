@@ -12,6 +12,11 @@ public class WeightedEdge extends Edge {
         super(src, dest);
     }
 
+    public WeightedEdge(WeightedEdge e) {
+        super(e.getSrc(), e.getDest());
+        this.weight = e.getWeight();
+    }
+
     public int getWeight() {
         return weight;
     }
