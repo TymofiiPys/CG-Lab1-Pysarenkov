@@ -328,14 +328,26 @@ public class Graph {
      * @param point point to locate
      * @return indices of chains between which lies the point
      */
-    public int[] pointLocation(Point2D.Float point) {
+    public ArrayList<Integer>[] pointLocation(Point2D.Float point) {
         if (isChainsMethodApplicable == null) {
             throw new RuntimeException("Chains not found yet.");
         }
         if (!isChainsMethodApplicable) {
             throw new RuntimeException("Chain method is not applicable to the graph.");
         }
-        int[] chainsBetween = new int[]{-1, -1};
+        ArrayList<Integer>[] chainsBetween = new ArrayList[2];
+        ArrayList<Integer> leftSide = chainsBetween[0] = new ArrayList<>();
+        ArrayList<Integer> rightSide = chainsBetween[1] = new ArrayList<>();
+        boolean onEdge = false;
+        boolean leftToLeftmost = true;
+        if(point.y > nodes.getLast().y) {
+            leftSide.add(-3);
+            return chainsBetween;
+        }
+        if(point.y < nodes.getFirst().y) {
+            leftSide.add(-4);
+            return chainsBetween;
+        }
         for (int i = 0; i < chains.size(); i++) {
             var curChain = chains.get(i);
             for (WeightedEdge weightedEdge : curChain) {
@@ -348,21 +360,41 @@ public class Graph {
                             - point.getX() * dest.getY()
                             - src.getX() * point.getY()
                             - dest.getX() * src.getY();
+                    // if less than 0 - we have a clockwise turn -
+                    // the point is right to current chain.
+                    // if we already found a chain to the left of the point,
+                    // empty the list as the current one is closer
                     if (doubledSquare < 0) {
-                        chainsBetween[0] = i;
-                        continue;
+                        if(i == 0) {
+                            leftToLeftmost = false;
+                        }
+                        leftSide.add(0, i);
+                        break;
                     }
+                    // if more than 0 - we have a counterclockwise turn -
+                    // the point is left to current chain
                     if (doubledSquare > 0) {
-                        chainsBetween[1] = i;
+                        // if we already know that the point lies on the edge(s)
+                        // and the list of chains containing it is now fulfilled,
+                        // then we won't have to check remaining chains
+                        if (!onEdge)
+                            rightSide.add(i);
+                        // return as only the current one can be the closest to the right of the point
                         return chainsBetween;
                     }
-//                    if (k == 0 && doubledSquare == 0) {
-//                        chainsBetween[k] = i;
-//                        return chainsBetween;
-//                    }
+                    // if equal to 0, the point lies on the edge(s)
+                    if (!onEdge) {
+                        onEdge = true;
+                        leftSide.clear();
+                    }
+                    leftSide.add(i);
+                    break;
                 }
             }
         }
+        // we run through full cycle only when the point
+        // is not left to even the rightmost chain
+        leftSide.add(0, -1);
         return chainsBetween;
     }
 

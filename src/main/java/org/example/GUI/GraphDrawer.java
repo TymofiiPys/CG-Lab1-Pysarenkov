@@ -156,18 +156,21 @@ public class GraphDrawer {
         Graphics2D gr = (Graphics2D) panelDraw.getGraphics();
         gr.clearRect(0, 0, panelDraw.getWidth(), panelDraw.getHeight());
         layer = 1;
-        ArrayList<ArrayList<WeightedEdge>> chainsOrig = graph.getChains();
-        ArrayList<ArrayList<WeightedEdge>> chains = new ArrayList<>();
-        for (var chain : chainsOrig) {
-            ArrayList<WeightedEdge> chainCopy = new ArrayList<>();
-            for (var edge : chain) {
-                chainCopy.add(new WeightedEdge(edge));
-            }
-            chains.add(chainCopy);
-        }
+//        ArrayList<ArrayList<WeightedEdge>> chainsOrig = graph.getChains();
+        ArrayList<ArrayList<WeightedEdge>> chains = graph.getChains();
+//        for (var chain : chainsOrig) {
+//            ArrayList<WeightedEdge> chainCopy = new ArrayList<>();
+//            for (var edge : chain) {
+//                chainCopy.add(new WeightedEdge(edge));
+//            }
+//            chains.add(chainCopy);
+//        }
         gr.setStroke(new BasicStroke(2.0f));
         int colorSeed = 0;
         Random colorRand = new Random(colorSeed);
+        for (WeightedEdge edge : graph.getEdges()) {
+            edge.setDrawWeight(edge.getWeight());
+        }
         for (ArrayList<WeightedEdge> chain : chains.reversed()) {
             gr.setColor(
                     new Color(
@@ -182,11 +185,11 @@ public class GraphDrawer {
                 double tangent = Math.atan(-(pt2.y - pt1.y) / (pt2.x - pt1.x));
                 double sin = Math.sin(tangent);
                 double cos = Math.cos(tangent);
-                gr.drawLine((int) (pt1.x + 2 * (edge.getWeight() - 1)),
-                        (int) (pt1.y - 2 * (edge.getWeight() - 1)),
-                        (int) (pt2.x + 2 * (edge.getWeight() - 1)),
-                        (int) (pt2.y - 2 * (edge.getWeight() - 1)));
-                edge.setWeight(edge.getWeight() - 1);
+                gr.drawLine((int) (pt1.x + 2 * (edge.getDrawWeight() - 1)),
+                        (int) (pt1.y - 2 * (edge.getDrawWeight() - 1)),
+                        (int) (pt2.x + 2 * (edge.getDrawWeight() - 1)),
+                        (int) (pt2.y - 2 * (edge.getDrawWeight() - 1)));
+                edge.setDrawWeight(edge.getDrawWeight() - 1);
             }
         }
         drawDirectedEnumeratedGraph(false);
@@ -198,7 +201,7 @@ public class GraphDrawer {
         gr.fillOval((int) p.getX() - nodesRad, (int) p.getY() - nodesRad, 2 * nodesRad, 2 * nodesRad);
     }
 
-    public int[] pointLocation(Point2D.Float p) {
+    public ArrayList<Integer>[] pointLocation(Point2D.Float p) {
         return graph.pointLocation(p);
     }
 

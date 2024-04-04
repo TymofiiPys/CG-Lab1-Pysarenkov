@@ -10,6 +10,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 public class MainWindow extends Container {
     public JButton pointLocButton;
@@ -45,14 +46,43 @@ public class MainWindow extends Container {
         pointLocButton.addActionListener(e -> {
             Point2D.Float p = new Point2D.Float(Float.parseFloat(contrPanXTextField.getText()), Float.parseFloat(contrPanYTextField.getText()));
             graphDrawer.drawPoint(graphDrawer.adaptToPanel(p));
-            int[] chains = graphDrawer.pointLocation(p);
+            ArrayList<Integer>[] chains = graphDrawer.pointLocation(p);
             JDialog dialog = new JDialog();
             dialog.setTitle("");
-            JLabel label = new JLabel("<html><center>Точка знаходиться між ланцюгами " + chains[0] + " і " + chains[1] + "</center></html>");
+            StringBuilder text = new StringBuilder();
+            text.append("<html><center> Точка знаходиться ");
+            if (chains[1].isEmpty()) {
+                if (chains[0].getFirst() == -1) {
+                    text.append("ззовні від графа, справа");
+                }
+                else if (chains[0].getFirst() == -3) {
+                    text.append("ззовні від графа, зверху від найвищої точки");
+                } else if (chains[0].getFirst() == -4) {
+                    text.append("ззовні від графа, знизу від найнижчої точки");
+                } else {
+                    text.append("на ланцюгах ");
+                    for (int chainInd : chains[0]) {
+                        text.append(chainInd).append(", ");
+                    }
+                    text.setLength(text.length() - 2);
+                }
+            } else {
+                if(chains[1].getFirst() == 0) {
+                    text.append("ззовні від графа, зліва");
+                } else {
+                    text.append("між ланцюгами ")
+                            .append(chains[0].getFirst())
+                            .append(" і ")
+                            .append(chains[1].getFirst());
+                }
+            }
+            text.append("</center></html>");
+            JLabel label = new JLabel(text.toString());
             label.setHorizontalAlignment(SwingConstants.CENTER);
             dialog.add(label);
             dialog.setSize(200, 200);
             dialog.setResizable(true);
+            dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         });
         showDirGrButton.addActionListener(e -> graphDrawer.drawDirectedEnumeratedGraph(true));
@@ -91,6 +121,7 @@ public class MainWindow extends Container {
         frame.setMinimumSize(mw.mainWindowDims);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 }

@@ -8,6 +8,8 @@ import java.awt.geom.Point2D;
 public class WeightedEdge extends Edge {
     private int weight;
 
+    private int drawWeight;
+
     public WeightedEdge(Point2D.Float src, Point2D.Float dest) {
         super(src, dest);
     }
@@ -23,5 +25,13 @@ public class WeightedEdge extends Edge {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public int getDrawWeight() {
+        return drawWeight;
+    }
+
+    public void setDrawWeight(int drawWeight) {
+        this.drawWeight = drawWeight;
     }
 }
