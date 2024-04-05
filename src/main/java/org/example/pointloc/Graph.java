@@ -80,7 +80,7 @@ public class Graph {
             addToNodeLists(srcInd, destInd, k);
             k++;
         }
-        System.out.println();
+        checkChainMethodApplicabilityEdges();
     }
 
     /**
@@ -209,6 +209,9 @@ public class Graph {
      * incoming and outgoing edges from each node except the first and the last
      */
     public void weightBalancing() {
+        if(!isChainsMethodApplicable) {
+            return;
+        }
         for (var edge : edges) {
             edge.setWeight(1);
         }
@@ -249,10 +252,7 @@ public class Graph {
         return false;
     }
 
-    private void checkChainMethodApplicability() {
-        // Graph chains must be monotonous relative to a line.
-        // For simplicity, Y axis is chosen to be this line
-
+    private void checkChainMethodApplicabilityEdges(){
         // TODO: Check for method applicability when the graph has a node
         //   higher than 0th but can't be reached
         for (int i = 1; i < nodes.size(); i++) {
@@ -273,6 +273,12 @@ public class Graph {
                 return;
             }
         }
+    }
+
+    private void checkChainMethodApplicabilityChains() {
+        // Graph chains must be monotonous relative to a line.
+        // For simplicity, Y axis is chosen to be this line
+
         Point2D.Float prevPoint;
         for (ArrayList<WeightedEdge> chain : chains) {
             prevPoint = chain.getFirst().getSrc();
@@ -305,6 +311,9 @@ public class Graph {
     }
 
     public ArrayList<ArrayList<WeightedEdge>> getChains() {
+        if(!isChainsMethodApplicable) {
+            return null;
+        }
         if (!balanced) {
             throw new RuntimeException("The graph must be balanced first!");
         }
@@ -338,7 +347,7 @@ public class Graph {
         if (!chains.isEmpty()) {
             chainsFound = true;
             this.chains = chains;
-            checkChainMethodApplicability();
+            checkChainMethodApplicabilityChains();
         }
         return chains;
     }

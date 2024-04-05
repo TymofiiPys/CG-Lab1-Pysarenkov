@@ -49,7 +49,7 @@ public class Lab1MenuBar extends JMenuBar {
                     mw.statusLabel.setForeground(Color.RED);
                     mw.statusLabel.setText("<html> До графу НЕ можна <br> застосувати <br> метод ланцюгів </html>");
                     mw.showChainsButton.setEnabled(false);
-                    mw.showDirGrButton.setEnabled(false);
+                    mw.showDirGrButton.setEnabled(true);
                     mw.pointLocButton.setEnabled(false);
                 }
             }
