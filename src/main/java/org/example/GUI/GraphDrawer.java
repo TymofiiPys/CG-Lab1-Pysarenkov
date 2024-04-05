@@ -166,7 +166,7 @@ public class GraphDrawer {
 //            chains.add(chainCopy);
 //        }
         gr.setStroke(new BasicStroke(2.0f));
-        int colorSeed = 0;
+        int colorSeed = 2;
         Random colorRand = new Random(colorSeed);
         for (WeightedEdge edge : graph.getEdges()) {
             edge.setDrawWeight(edge.getWeight());
@@ -174,9 +174,9 @@ public class GraphDrawer {
         for (ArrayList<WeightedEdge> chain : chains.reversed()) {
             gr.setColor(
                     new Color(
-                            colorRand.nextInt(256),
-                            colorRand.nextInt(256),
-                            colorRand.nextInt(256)
+                            colorRand.nextInt(150) + 100,
+                            colorRand.nextInt(150) + 100,
+                            colorRand.nextInt(150) + 100
                     )
             );
             for (WeightedEdge edge : chain) {
