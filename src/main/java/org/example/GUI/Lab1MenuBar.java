@@ -54,7 +54,10 @@ public class Lab1MenuBar extends JMenuBar {
                 }
             }
         }));
+        JMenuItem exitMI = new JMenuItem("Вийти");
+        exitMI.addActionListener(e -> System.exit(0));
         fileMenu.add(openMI);
+        fileMenu.add(exitMI);
         this.add(fileMenu);
     }
 }

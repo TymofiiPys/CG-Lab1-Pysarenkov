@@ -48,7 +48,8 @@ public class Graph {
         for (int i = 0; i < N; i++) {
             Point2D.Float curPt = new Point2D.Float();
             curPt.setLocation(nodes.get(i));
-            sortedNodes.add(i, curPt);
+            if (!sortedNodes.contains(curPt))
+                sortedNodes.add(i, curPt);
         }
         sortedNodes.sort(new Point2DYComparator());
         this.nodes = sortedNodes;
@@ -75,8 +76,10 @@ public class Graph {
                 srcInd = destInd;
                 destInd = temp;
             }
-            this.edges.add(k, new WeightedEdge(this.nodes.get(srcInd),
-                    this.nodes.get(destInd)));
+            WeightedEdge edgeToAdd = new WeightedEdge(this.nodes.get(srcInd),
+                    this.nodes.get(destInd));
+            if (!this.edges.contains(edgeToAdd))
+                this.edges.add(k, edgeToAdd);
             addToNodeLists(srcInd, destInd, k);
             k++;
         }
@@ -209,7 +212,7 @@ public class Graph {
      * incoming and outgoing edges from each node except the first and the last
      */
     public void weightBalancing() {
-        if(!isChainsMethodApplicable) {
+        if (isChainsMethodApplicable != null && isChainsMethodApplicable == false) {
             return;
         }
         for (var edge : edges) {
@@ -252,7 +255,7 @@ public class Graph {
         return false;
     }
 
-    private void checkChainMethodApplicabilityEdges(){
+    private void checkChainMethodApplicabilityEdges() {
         // TODO: Check for method applicability when the graph has a node
         //   higher than 0th but can't be reached
         for (int i = 1; i < nodes.size(); i++) {
@@ -311,7 +314,7 @@ public class Graph {
     }
 
     public ArrayList<ArrayList<WeightedEdge>> getChains() {
-        if(!isChainsMethodApplicable) {
+        if (isChainsMethodApplicable != null && !isChainsMethodApplicable) {
             return null;
         }
         if (!balanced) {
@@ -370,11 +373,11 @@ public class Graph {
         ArrayList<Integer> rightSide = chainsBetween[1] = new ArrayList<>();
         boolean onEdge = false;
         boolean leftToLeftmost = true;
-        if(point.y > nodes.getLast().y) {
+        if (point.y > nodes.getLast().y) {
             leftSide.add(-3);
             return chainsBetween;
         }
-        if(point.y < nodes.getFirst().y) {
+        if (point.y < nodes.getFirst().y) {
             leftSide.add(-4);
             return chainsBetween;
         }
@@ -395,7 +398,7 @@ public class Graph {
                     // if we already found a chain to the left of the point,
                     // empty the list as the current one is closer
                     if (doubledSquare < 0) {
-                        if(i == 0) {
+                        if (i == 0) {
                             leftToLeftmost = false;
                         }
                         leftSide.add(0, i);

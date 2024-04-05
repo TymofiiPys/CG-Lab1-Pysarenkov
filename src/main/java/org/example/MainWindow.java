@@ -53,7 +53,7 @@ public class MainWindow extends Container {
             graphDrawer.drawPoint(graphDrawer.adaptToPanel(p));
             ArrayList<Integer>[] chains = graphDrawer.pointLocation(p);
             JDialog dialog = new JDialog();
-            dialog.setTitle("");
+            dialog.setTitle("Локалізація точки");
             StringBuilder text = new StringBuilder();
             text.append("<html><center> Точка знаходиться ");
             if (chains[1].isEmpty()) {
