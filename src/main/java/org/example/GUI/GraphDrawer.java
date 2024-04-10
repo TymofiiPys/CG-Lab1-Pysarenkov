@@ -82,20 +82,27 @@ public class GraphDrawer {
             for (WeightedEdge edge : edges) {
                 Point2D.Float pt1 = adaptToPanel(edge.getSrc());
                 Point2D.Float pt2 = adaptToPanel(edge.getDest());
+                if (edge.isRegularized()) {
+                    gr.setStroke(new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+                            0, new float[]{9}, 0));
+                }
                 gr.drawLine((int) pt1.x,
                         (int) pt1.y,
                         (int) pt2.x,
                         (int) pt2.y);
+                if (edge.isRegularized()) {
+                    gr.setStroke(new BasicStroke());
+                }
             }
-        }
-        ArrayList<Point2D.Float> nodes = graph.getNodes();
-        gr.setColor(Color.RED);
-        for (Point2D.Float node : nodes) {
-            Point2D.Float adapted = adaptToPanel(node);
-            gr.fillOval((int) (adapted.x - nodesRad),
-                    (int) (adapted.y - nodesRad),
-                    2 * nodesRad,
-                    2 * nodesRad);
+            ArrayList<Point2D.Float> nodes = graph.getNodes();
+            gr.setColor(Color.RED);
+            for (Point2D.Float node : nodes) {
+                Point2D.Float adapted = adaptToPanel(node);
+                gr.fillOval((int) (adapted.x - nodesRad),
+                        (int) (adapted.y - nodesRad),
+                        2 * nodesRad,
+                        2 * nodesRad);
+            }
         }
         layer = 0;
     }
@@ -185,10 +192,17 @@ public class GraphDrawer {
                 double tangent = Math.atan(-(pt2.y - pt1.y) / (pt2.x - pt1.x));
                 double sin = Math.sin(tangent);
                 double cos = Math.cos(tangent);
+                if (edge.isRegularized()) {
+                    gr.setStroke(new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+                            0, new float[]{9}, 0));
+                }
                 gr.drawLine((int) (pt1.x + 2 * (edge.getDrawWeight() - 1)),
                         (int) (pt1.y - 2 * (edge.getDrawWeight() - 1)),
                         (int) (pt2.x + 2 * (edge.getDrawWeight() - 1)),
                         (int) (pt2.y - 2 * (edge.getDrawWeight() - 1)));
+                if (edge.isRegularized()) {
+                    gr.setStroke(new BasicStroke());
+                }
                 edge.setDrawWeight(edge.getDrawWeight() - 1);
             }
         }
@@ -209,5 +223,20 @@ public class GraphDrawer {
         return graph != null;
     }
 
+    public String getChainList() {
+        StringBuilder chainList = new StringBuilder();
 
+        ArrayList<ArrayList<WeightedEdge>> chains = graph.getChains();
+        ArrayList<Point2D.Float> nodes = graph.getNodes();
+        for (int i = 0; i < chains.size(); i++) {
+            var chain = chains.get(i);
+            chainList.append("[").append(i).append("] : ");
+            for (WeightedEdge edge : chain) {
+                chainList.append(nodes.indexOf(edge.getSrc())).append(", ");
+            }
+            chainList.append(nodes.size() - 1).append("<br>");
+        }
+
+        return chainList.toString();
+    }
 }

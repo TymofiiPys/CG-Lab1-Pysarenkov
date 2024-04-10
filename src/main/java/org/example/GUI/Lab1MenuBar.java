@@ -32,7 +32,7 @@ public class Lab1MenuBar extends JMenuBar {
             mw.showChainsButton.setEnabled(true);
             mw.graphDrawer.drawGraph(true);
             Boolean isChainMethodApplicable = mw.graphDrawer.graphChainMethodApplicable();
-            if(isChainMethodApplicable == null) {
+            if (isChainMethodApplicable == null) {
                 mw.statusLabel.setForeground(Color.RED);
                 mw.statusLabel.setText("Помилка");
                 mw.showChainsButton.setEnabled(false);
@@ -45,6 +45,19 @@ public class Lab1MenuBar extends JMenuBar {
                     mw.showChainsButton.setEnabled(true);
                     mw.showDirGrButton.setEnabled(true);
                     mw.pointLocButton.setEnabled(true);
+                    JDialog dialog = new JDialog();
+                    dialog.setTitle("Ланцюги");
+                    StringBuilder text = new StringBuilder();
+                    text.append("<html><center>");
+                    text.append(mw.graphDrawer.getChainList());
+                    text.append("</center></html>");
+                    JLabel label = new JLabel(text.toString());
+                    label.setHorizontalAlignment(SwingConstants.CENTER);
+                    dialog.add(label);
+                    dialog.setSize(400, 300);
+                    dialog.setResizable(true);
+                    dialog.setLocationRelativeTo(null);
+                    dialog.setVisible(true);
                 } else {
                     mw.statusLabel.setForeground(Color.RED);
                     mw.statusLabel.setText("<html> До графу НЕ можна <br> застосувати <br> метод ланцюгів </html>");

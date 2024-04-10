@@ -83,7 +83,8 @@ public class Graph {
             addToNodeLists(srcInd, destInd, k);
             k++;
         }
-        checkChainMethodApplicabilityEdges();
+//        checkChainMethodApplicabilityEdges();
+        regularize();
     }
 
     /**
@@ -161,6 +162,28 @@ public class Graph {
         incomingEdgeIndices.get(destNodeIndex).sort(new EdgeSrcXComparator(edges));
     }
 
+    private void regularize() {
+        for (int i = nodes.size() - 2; i >= 0; i--) {
+            if (outgoingEdgeIndices.get(i).isEmpty()) {
+                WeightedEdge edgeToAdd = new WeightedEdge(this.nodes.get(i),
+                        this.nodes.get(i+1));
+                edgeToAdd.setRegularized(true);
+                edges.add(edgeToAdd);
+                addToNodeLists(i, i+1, edges.size() - 1);
+            }
+        }
+
+        for (int i = 1; i < nodes.size(); i++) {
+            if (incomingEdgeIndices.get(i).isEmpty()) {
+                WeightedEdge edgeToAdd = new WeightedEdge(this.nodes.get(i-1),
+                        this.nodes.get(i));
+                edgeToAdd.setRegularized(true);
+                edges.add(edgeToAdd);
+                addToNodeLists(i - 1, i, edges.size() - 1);
+            }
+        }
+    }
+
     /**
      * @param in index of node in the nodes array
      * @return total weight of edges incoming to the node
@@ -212,7 +235,7 @@ public class Graph {
      * incoming and outgoing edges from each node except the first and the last
      */
     public void weightBalancing() {
-        if (isChainsMethodApplicable != null && isChainsMethodApplicable == false) {
+        if (isChainsMethodApplicable != null && !isChainsMethodApplicable) {
             return;
         }
         for (var edge : edges) {
@@ -256,20 +279,17 @@ public class Graph {
     }
 
     private void checkChainMethodApplicabilityEdges() {
-        // TODO: Check for method applicability when the graph has a node
-        //   higher than 0th but can't be reached
+        // Check for method applicability when the graph has a node
+        //  higher than 0th but can't be reached
         for (int i = 1; i < nodes.size(); i++) {
             if (incomingEdgeIndices.get(i).isEmpty()) {
                 isChainsMethodApplicable = false;
                 return;
             }
         }
-        // TODO: When the graph is disjoint
-        // answer: if the graph is disjoint then some other node has no incoming
-        // edges, which is checked above
 
-        // TODO: when the graph has a node lower than nth but has no outgoing
-        //  edges
+        // when the graph has a node lower than nth
+        // but has no outgoing edges
         for (int i = 0; i < nodes.size() - 1; i++) {
             if (outgoingEdgeIndices.get(i).isEmpty()) {
                 isChainsMethodApplicable = false;
