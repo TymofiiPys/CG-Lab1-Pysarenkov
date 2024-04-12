@@ -162,21 +162,42 @@ public class Graph {
         incomingEdgeIndices.get(destNodeIndex).sort(new EdgeSrcXComparator(edges));
     }
 
+    private boolean intersectsWithAnyEdge(Edge e) {
+        for (var edge : edges) {
+            if (edge.intersect(e))
+                return true;
+        }
+        return false;
+    }
+
     private void regularize() {
+        WeightedEdge edgeToAdd;
         for (int i = nodes.size() - 2; i >= 0; i--) {
             if (outgoingEdgeIndices.get(i).isEmpty()) {
-                WeightedEdge edgeToAdd = new WeightedEdge(this.nodes.get(i),
-                        this.nodes.get(i+1));
+                int k = 0;
+                do {
+                    k++;
+                    edgeToAdd = new WeightedEdge(this.nodes.get(i),
+                            this.nodes.get(i + k));
+                } while (intersectsWithAnyEdge(edgeToAdd) && i + k < N);
+                if (i + k >= N)
+                    continue;
                 edgeToAdd.setRegularized(true);
                 edges.add(edgeToAdd);
-                addToNodeLists(i, i+1, edges.size() - 1);
+                addToNodeLists(i, i + k, edges.size() - 1);
             }
         }
 
         for (int i = 1; i < nodes.size(); i++) {
             if (incomingEdgeIndices.get(i).isEmpty()) {
-                WeightedEdge edgeToAdd = new WeightedEdge(this.nodes.get(i-1),
-                        this.nodes.get(i));
+                int k = 0;
+                do {
+                    k++;
+                    edgeToAdd = new WeightedEdge(this.nodes.get(i - k),
+                            this.nodes.get(i));
+                } while (intersectsWithAnyEdge(edgeToAdd) && i - k >= 0);
+                if (i - k < 0)
+                    continue;
                 edgeToAdd.setRegularized(true);
                 edges.add(edgeToAdd);
                 addToNodeLists(i - 1, i, edges.size() - 1);
